@@ -1,4 +1,4 @@
-# Climb-Assist-Cordova
+# Climb-Assist-Mobile
 
 Welcome to the Cordova app for Android and IOS!
 
