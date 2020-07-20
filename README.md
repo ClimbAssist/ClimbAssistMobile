@@ -33,8 +33,8 @@ npm install
 
 ### Compiles build for android or ios
 ```
-npm cordova-build-android
-npm cordova-build-ios
+npm run cordova-build-android
+npm run cordova-build-ios
 ```
 
 ### run dev build for local simulation
