@@ -1,5 +1,8 @@
 <template>
   <v-container>
+    <v-btn v-if="!downloaded" @click="downloadFiles()" :disabled="downlading"
+      >download</v-btn
+    >
     <v-container>
       <v-img :src="crag.crag.imageLocation" aspect-ratio="2" contain lazy>
         <v-layout
@@ -256,27 +259,30 @@
 </template>
 
 <script>
-import Chart from "chart.js";
-import { mapGetters } from "vuex";
+import Chart from 'chart.js';
+import axios from 'axios';
+import * as fs from 'fs';
+import { mapGetters } from 'vuex';
 export default {
-  name: "cragInfo",
+  name: 'cragInfo',
   data() {
     return {
       routeFromPage: false,
-      tradStyle: "trad-style",
-      sportStyle: "sport-style",
-      boulderStyle: "boulder-style",
+      tradStyle: 'trad-style',
+      sportStyle: 'sport-style',
+      boulderStyle: 'boulder-style',
       infoActive: true,
       apiData: null,
       apiDataJS: null,
       apiWalls: null,
-      apiRoutes: []
+      apiRoutes: [],
+      downloading: false,
       // routeCheck: null
     };
   },
   computed: {
     ...mapGetters({
-      crag: "crag"
+      crag: 'crag',
     }),
     boulderShow() {
       if (this.ropeTotals != null) {
@@ -298,6 +304,9 @@ export default {
     sampleCrag() {
       return this.$store.state.filter.currentCrag;
     },
+    downloaded() {
+      return this.$store.state.frame.downloaded;
+    },
     panel() {
       let panel = [];
       if (this.activeRoute) {
@@ -316,14 +325,14 @@ export default {
         trad: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         sport: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         boulder: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        total: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        total: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       };
       for (let wkey in this.crag.walls) {
         for (let rkey in this.crag.walls[wkey].routes) {
-          if (this.crag.walls[wkey].routes[rkey].style === "trad") {
+          if (this.crag.walls[wkey].routes[rkey].style === 'trad') {
             gradeTotals.trad[this.crag.walls[wkey].routes[rkey].grade]++;
             gradeTotals.total[this.crag.walls[wkey].routes[rkey].grade]++;
-          } else if (this.crag.walls[wkey].routes[rkey].style === "sport") {
+          } else if (this.crag.walls[wkey].routes[rkey].style === 'sport') {
             gradeTotals.sport[this.crag.walls[wkey].routes[rkey].grade]++;
             gradeTotals.total[this.crag.walls[wkey].routes[rkey].grade]++;
           } else {
@@ -346,7 +355,7 @@ export default {
         }
       }
       return gradeTotals;
-    }
+    },
   },
   methods: {
     checkRoute(wall, route) {
@@ -356,21 +365,21 @@ export default {
         routeCheck.wall === this.activeRoute.wall &&
         routeCheck.route === this.activeRoute.route
       ) {
-        this.$store.commit("updateActiveRoute", null);
+        this.$store.commit('updateActiveRoute', null);
       } else {
-        this.$store.commit("updateActiveRoute", routeCheck);
+        this.$store.commit('updateActiveRoute', routeCheck);
       }
 
       this.routeFromPage = false;
     },
     getClass(style) {
-      if (style === "trad") {
+      if (style === 'trad') {
         return this.tradStyle;
       }
-      if (style === "sport") {
+      if (style === 'sport') {
         return this.sportStyle;
       }
-      if (style === "boulder") {
+      if (style === 'boulder') {
         return this.boulderStyle;
       }
     },
@@ -385,10 +394,10 @@ export default {
       }
     },
     setCharts() {
-      let ctx = document.getElementById("gradeChartRope");
+      let ctx = document.getElementById('gradeChartRope');
       let labels = [];
       for (let i in this.gradeTotals.total) {
-        labels.push("5." + i);
+        labels.push('5.' + i);
       }
       let filteredTrad = this.gradeTotals.trad.filter(function(el) {
         return el != null;
@@ -398,31 +407,31 @@ export default {
       });
       let boulderLabels = [];
       for (let i in this.gradeTotals.boulder) {
-        boulderLabels.push("V" + i);
+        boulderLabels.push('V' + i);
       }
       let filteredBoulder = this.gradeTotals.boulder.filter(function(el) {
         return el != null;
       });
       this.gradeChartRope = new Chart(ctx, {
-        type: "bar",
+        type: 'bar',
         data: {
           labels: labels,
           datasets: [
             {
-              label: "Trad Routes",
+              label: 'Trad Routes',
               data: filteredTrad,
-              backgroundColor: "rgba(255, 99, 132, 0.2)",
-              borderColor: "rgba(255, 99, 132, 1)",
-              borderWidth: 1
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1,
             },
             {
-              label: "Sport Routes",
+              label: 'Sport Routes',
               data: filteredSport,
-              backgroundColor: "rgba(54, 162, 235, 0.2)",
-              borderColor: "rgba(54, 162, 235, 1)",
-              borderWidth: 1
-            }
-          ]
+              backgroundColor: 'rgba(54, 162, 235, 0.2)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1,
+            },
+          ],
         },
         options: {
           scales: {
@@ -430,45 +439,45 @@ export default {
               {
                 gridLines: {
                   display: false,
-                  drawBorder: false
+                  drawBorder: false,
                 },
                 ticks: {
                   display: false,
-                  beginAtZero: true
-                }
-              }
+                  beginAtZero: true,
+                },
+              },
             ],
             xAxes: [
               {
                 gridLines: {
                   display: false,
                   drawBorder: false,
-                  beginAtZero: false
-                }
-              }
-            ]
+                  beginAtZero: false,
+                },
+              },
+            ],
           },
           legend: {
-            display: false
-          }
-        }
+            display: false,
+          },
+        },
       });
 
-      ctx = document.getElementById("gradeChartBoulder");
+      ctx = document.getElementById('gradeChartBoulder');
 
       this.gradeChartBoulder = new Chart(ctx, {
-        type: "bar",
+        type: 'bar',
         data: {
           labels: boulderLabels,
           datasets: [
             {
-              label: "Bouldering Routes",
+              label: 'Bouldering Routes',
               data: filteredBoulder,
-              backgroundColor: "rgba(255, 99, 132, 0.2)",
-              borderColor: "rgba(255, 99, 132, 1)",
-              borderWidth: 1
-            }
-          ]
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1,
+            },
+          ],
         },
         options: {
           scales: {
@@ -476,28 +485,28 @@ export default {
               {
                 gridLines: {
                   display: false,
-                  drawBorder: false
+                  drawBorder: false,
                 },
                 ticks: {
                   display: false,
-                  beginAtZero: true
-                }
-              }
+                  beginAtZero: true,
+                },
+              },
             ],
             xAxes: [
               {
                 gridLines: {
                   display: false,
                   drawBorder: false,
-                  beginAtZero: false
-                }
-              }
-            ]
+                  beginAtZero: false,
+                },
+              },
+            ],
           },
           legend: {
-            display: false
-          }
-        }
+            display: false,
+          },
+        },
       });
       // ctx = document.getElementById("typeChart");
       // let types = [this.crag.trad, this.crag.sport, this.crag.boulder]
@@ -556,7 +565,108 @@ export default {
       //     }
       //   }
       // });
-    }
+    },
+    downloadFiles() {
+      this.downloading = true;
+      window.requestFileSystem(window.PERSISTENT, 5 * 1024 * 1024, (fs) => {
+        console.log('file system open: ' + fs.name);
+        console.log(fs.root);
+        fs.root.getDirectory(
+          'crags',
+          { create: true },
+          (dirEntry) => {
+            console.log(dirEntry);
+          },
+          (error) => {
+            console.log(error);
+          }
+        );
+        fs.root.getDirectory(
+          'crags/' + this.$route.params.frame,
+          { create: true },
+          (dirEntry) => {
+            console.log(dirEntry);
+          },
+          (error) => {
+            console.log(error);
+          }
+        );
+        fs.root.getFile(
+          'crags/' +
+            this.$route.params.frame +
+            '/' +
+            this.$route.params.frame +
+            '.json',
+          { create: true, exclusive: false },
+          (fileEntry) => {
+            console.log('fileEntry is file?' + fileEntry.isFile.toString());
+            console.log(fileEntry);
+            this.writeJsonFile(fileEntry);
+          },
+          (error) => {
+            console.log(error);
+          }
+        );
+        fs.root.getFile(
+          'crags/' +
+            this.$route.params.frame +
+            '/' +
+            this.$route.params.frame +
+            '.glb',
+          { create: true, exclusive: false },
+          (fileEntry) => {
+            console.log('fileEntry is file?' + fileEntry.isFile.toString());
+            console.log(fileEntry);
+            this.downloadFile(fileEntry);
+          },
+          (error) => {
+            console.log(error);
+          }
+        );
+      });
+      this.downloading = false;
+      this.$store.commit('setDownloaded', true);
+    },
+    writeJsonFile(fileEntry) {
+      console.log('in write file');
+      fileEntry.createWriter((fileWriter) => {
+        fileWriter.write(this.crag.crag);
+        fileWriter.onwriteend = () => {
+          console.log('Successful file write...');
+        };
+
+        fileWriter.onerror = function(e) {
+          console.log('Failed file write: ' + e.toString());
+        };
+      });
+    },
+    async downloadFile(fileEntry) {
+      try {
+        console.log('downloading model');
+        let blob = await axios({
+          method: 'get',
+          url: this.crag.crag.model.modelLocation,
+          responseType: 'blob',
+        });
+        console.log('file downloaded');
+        this.writeGlbFile(fileEntry, blob);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    writeGlbFile(fileEntry, dataObj) {
+      console.log('in write file');
+      fileEntry.createWriter((fileWriter) => {
+        fileWriter.write(dataObj.data);
+        fileWriter.onwriteend = () => {
+          console.log('Successful file write...');
+        };
+
+        fileWriter.onerror = function(e) {
+          console.log('Failed file write: ' + e.toString());
+        };
+      });
+    },
   },
   watch: {
     activeRoute: {
@@ -573,7 +683,7 @@ export default {
           }, 200);
         }
         this.routeFromPage = false;
-      }
+      },
     },
     gradeTotals: {
       handler() {
@@ -586,7 +696,7 @@ export default {
         });
         let labels = [];
         for (let i in this.gradeTotals.total) {
-          labels.push("5." + i);
+          labels.push('5.' + i);
         }
         this.gradeChartRope.data.datasets[0].data = filteredTrad;
         this.gradeChartRope.data.datasets[1].data = filteredSport;
@@ -595,7 +705,7 @@ export default {
 
         let boulderLabels = [];
         for (let i in this.gradeTotals.boulder) {
-          boulderLabels.push("V" + i);
+          boulderLabels.push('V' + i);
         }
 
         let filteredBoulder = this.gradeTotals.boulder.filter(function(el) {
@@ -607,8 +717,8 @@ export default {
 
         // this.typeChart.data.datasets[0].data = [this.crag.trad, this.crag.sport, this.crag.boulder]
         // this.typeChart.update()
-      }
-    }
+      },
+    },
     // routeCheck: {
     //   handler() {
     //     if (
@@ -632,7 +742,7 @@ export default {
   },
   deactivated() {
     this.infoActive = false;
-  }
+  },
 };
 </script>
 

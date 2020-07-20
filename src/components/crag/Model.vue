@@ -42,12 +42,16 @@
     </div>
     <canvas id="number" width="36" height="32"></canvas>
     <div id="scale">
-      <p>{{ scaleSize }} m ({{scaleSizeFt}} ft)</p>
+      <p>{{ scaleSize }} m ({{ scaleSizeFt }} ft)</p>
       <!-- <p>{{ inBounds }}</p> -->
     </div>
     <!-- <v-btn class="viewer-btn" v-if="camMoved" @click="resetCam()">reset</v-btn> -->
 
-    <div class="annotation" id="annotationElement" v-if="selectedObject && routeShow">
+    <div
+      class="annotation"
+      id="annotationElement"
+      v-if="selectedObject && routeShow"
+    >
       {{
         crag.walls[routePos[selectedPos].wall].routes[
           routePos[selectedPos].route
@@ -67,16 +71,20 @@
           routePos[selectedPos].route
         ].style
       }}
-      <span v-if="crag.walls[routePos[selectedPos].wall].routes[
-        routePos[selectedPos].route
-      ].pitches.length > 1">
-      {{
-        crag.walls[routePos[selectedPos].wall].routes[
-          routePos[selectedPos].route
-        ].pitches.length
-      }}
-      pitches
-    </span>
+      <span
+        v-if="
+          crag.walls[routePos[selectedPos].wall].routes[
+            routePos[selectedPos].route
+          ].pitches.length > 1
+        "
+      >
+        {{
+          crag.walls[routePos[selectedPos].wall].routes[
+            routePos[selectedPos].route
+          ].pitches.length
+        }}
+        pitches
+      </span>
     </div>
     <v-sheet row class="route-info" id="routeInfo" v-if="activeRoute">
       <v-card-text>
@@ -84,34 +92,42 @@
           {{ crag.walls[activeRoute.wall].routes[activeRoute.route].name }} 5.{{
             crag.walls[activeRoute.wall].routes[activeRoute.route].grade
           }}{{
-            crag.walls[activeRoute.wall].routes[activeRoute.route]
-              .gradeModifier
+            crag.walls[activeRoute.wall].routes[activeRoute.route].gradeModifier
           }}
           {{ crag.walls[activeRoute.wall].routes[activeRoute.route].style }}
-          <span v-if="crag.walls[activeRoute.wall].routes[activeRoute.route].pitches
-              .length > 1">
-          {{
-            crag.walls[activeRoute.wall].routes[activeRoute.route].pitches
-              .length
-          }}
-          pitches
-        </span>
+          <span
+            v-if="
+              crag.walls[activeRoute.wall].routes[activeRoute.route].pitches
+                .length > 1
+            "
+          >
+            {{
+              crag.walls[activeRoute.wall].routes[activeRoute.route].pitches
+                .length
+            }}
+            pitches
+          </span>
         </p>
         <p>
           {{
             crag.walls[activeRoute.wall].routes[activeRoute.route].protection
           }}
-          <span v-if="crag.walls[activeRoute.wall].routes[activeRoute.route].pitches
-            .length > 1">
-          {{
-            crag.walls[activeRoute.wall].routes[activeRoute.route].description
-          }}
-        </span>
-        <span v-else>
-          {{
-            crag.walls[activeRoute.wall].routes[activeRoute.route].pitches[0].description
-          }}
-        </span>
+          <span
+            v-if="
+              crag.walls[activeRoute.wall].routes[activeRoute.route].pitches
+                .length > 1
+            "
+          >
+            {{
+              crag.walls[activeRoute.wall].routes[activeRoute.route].description
+            }}
+          </span>
+          <span v-else>
+            {{
+              crag.walls[activeRoute.wall].routes[activeRoute.route].pitches[0]
+                .description
+            }}
+          </span>
         </p>
       </v-card-text>
     </v-sheet>
@@ -124,16 +140,16 @@
 </template>
 
 <script>
-import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { mapGetters } from "vuex";
-import axios from "axios"
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { mapGetters } from 'vuex';
+import axios from 'axios';
 import * as fs from 'fs';
 // import DecalGeometry from 'three-decal-geometry'
 
 export default {
-  name: "model",
+  name: 'model',
   data() {
     return {
       camera: null,
@@ -151,7 +167,7 @@ export default {
       camDistance: null,
       decals: [],
       group: null,
-      groupColors: ['#ffffff', '#FFFF33','#FF9933', '#FF99FF','#FF9999' ],
+      groupColors: ['#ffffff', '#FFFF33', '#FF9933', '#FF99FF', '#FF9999'],
       moved: false,
       selectedObject: null,
       raycaster: null,
@@ -170,7 +186,7 @@ export default {
       intersection: {
         intersects: false,
         point: new THREE.Vector3(),
-        normal: new THREE.Vector3()
+        normal: new THREE.Vector3(),
       },
       mouseHelper: undefined,
       timeout: undefined,
@@ -188,28 +204,41 @@ export default {
         // this.removeDecals()
         // this.loadDecals()
       },
-      deep: true
+      deep: true,
     },
     mesh: {
       handler() {
         if (this.mesh && !this.fromStore) {
           this.scene.remove(this.lowMesh);
         }
-      }
+      },
     },
     activeRoute: {
       handler() {
         if (this.activeRoute) {
-          let controlPoint = new THREE.Vector3( this.crag.walls[this.activeRoute.wall].routes[this.activeRoute.route].center.x,  this.crag.walls[this.activeRoute.wall].routes[this.activeRoute.route].center.y, this.crag.walls[this.activeRoute.wall].routes[this.activeRoute.route].center.z )
-          this.setControlPoint(controlPoint)
+          let controlPoint = new THREE.Vector3(
+            this.crag.walls[this.activeRoute.wall].routes[
+              this.activeRoute.route
+            ].center.x,
+            this.crag.walls[this.activeRoute.wall].routes[
+              this.activeRoute.route
+            ].center.y,
+            this.crag.walls[this.activeRoute.wall].routes[
+              this.activeRoute.route
+            ].center.z
+          );
+          this.setControlPoint(controlPoint);
         }
-      }
-    }
+      },
+    },
   },
   computed: {
     ...mapGetters({
-      crag: "crag"
+      crag: 'crag',
     }),
+    cragId() {
+      return this.$store.state.filter.cragState.cragId;
+    },
     // for setting bounds on camera - too heavy currently
     // cameraBounds() {
     //   if (this.mesh) {
@@ -240,8 +269,8 @@ export default {
     activeRoute() {
       return this.$store.state.frame.activeRoute;
     },
-    cragId() {
-      return this.$store.state.filter.cragState.cragId;
+    downloaded() {
+      return this.$store.state.frame.downloaded;
     },
     loadedModels() {
       return this.$store.state.model.loadedModels;
@@ -255,32 +284,42 @@ export default {
               this.routePos[key].route == this.activeRoute.route
             ) {
               if (this.lastActive) {
-                this.lastActiveObject.material.color.set(this.groupColors[this.lastActive.wall]);
+                this.lastActiveObject.material.color.set(
+                  this.groupColors[this.lastActive.wall]
+                );
               }
               let activeObject = this.group.children[key];
-              this.lastActiveObject = activeObject
-              this.lastActive = this.activeRoute
+              this.lastActiveObject = activeObject;
+              this.lastActive = this.activeRoute;
               activeObject.scale.set(
                 this.scaleFactor * 1.5,
                 this.scaleFactor * 1.5,
                 1
               );
-              activeObject.material.color.set("#40FF70");
+              activeObject.material.color.set('#40FF70');
 
               if (
                 this.activeLine &&
                 this.activeLine !== this.linesGroup.children[key]
               ) {
-                if (this.crag.walls[this.activeRoute.wall].routes[this.activeRoute.route].style === "sport") {
-                  this.activeLine.material.color.set("#0000ff");
-                } else if (this.crag.walls[this.activeRoute.wall].routes[this.activeRoute.route].style === "trad") {
-                  this.activeLine.material.color.set("#ff0000");
+                if (
+                  this.crag.walls[this.activeRoute.wall].routes[
+                    this.activeRoute.route
+                  ].style === 'sport'
+                ) {
+                  this.activeLine.material.color.set('#0000ff');
+                } else if (
+                  this.crag.walls[this.activeRoute.wall].routes[
+                    this.activeRoute.route
+                  ].style === 'trad'
+                ) {
+                  this.activeLine.material.color.set('#ff0000');
                 } else {
-                  this.activeLine.material.color.set("#ffff00");
+                  this.activeLine.material.color.set('#ffff00');
                 }
               }
               this.activeLine = this.linesGroup.children[key];
-              this.activeLine.material.color.set("#40FF70");
+              this.activeLine.material.color.set('#40FF70');
 
               this.loadAnchors();
               return activeObject;
@@ -289,13 +328,23 @@ export default {
         } else {
           this.scene.remove(this.anchorsGroup);
           if (this.lastActive) {
-            this.lastActiveObject.material.color.set(this.groupColors[this.lastActive.wall]);
-            if (this.crag.walls[this.lastActive.wall].routes[this.lastActive.route].style === "sport") {
-              this.activeLine.material.color.set("#0000ff");
-            } else if (this.crag.walls[this.lastActive.wall].routes[this.lastActive.route].style === "trad") {
-              this.activeLine.material.color.set("#ff0000");
+            this.lastActiveObject.material.color.set(
+              this.groupColors[this.lastActive.wall]
+            );
+            if (
+              this.crag.walls[this.lastActive.wall].routes[
+                this.lastActive.route
+              ].style === 'sport'
+            ) {
+              this.activeLine.material.color.set('#0000ff');
+            } else if (
+              this.crag.walls[this.lastActive.wall].routes[
+                this.lastActive.route
+              ].style === 'trad'
+            ) {
+              this.activeLine.material.color.set('#ff0000');
             } else {
-              this.activeLine.material.color.set("#ffff00");
+              this.activeLine.material.color.set('#ffff00');
             }
             this.lastActive = undefined;
             this.lastActiveObject = undefined;
@@ -306,8 +355,8 @@ export default {
       }
     },
     navHeight() {
-      var topNav = document.getElementsByClassName("v-app-bar");
-      var botNav = document.getElementsByClassName("v-bottom-navigation");
+      var topNav = document.getElementsByClassName('v-app-bar');
+      var botNav = document.getElementsByClassName('v-bottom-navigation');
       if (botNav) {
         var nav = topNav[0].clientHeight + botNav[0].clientHeight;
       } else {
@@ -321,12 +370,12 @@ export default {
       }
     },
     scaleSizeFt() {
-      return (this.scaleSize*3.28).toFixed(1);
-    }
+      return (this.scaleSize * 3.28).toFixed(1);
+    },
   },
   methods: {
     init: function() {
-      let container = document.getElementById("container");
+      let container = document.getElementById('container');
 
       this.scene = new THREE.Scene();
       this.origin = new THREE.Vector3();
@@ -364,14 +413,14 @@ export default {
       this.lastTarget = new THREE.Vector3();
 
       // set based on model
-      console.info("azimuth");
+      console.info('azimuth');
       console.log(this.crag.crag.model.azimuth);
       if (this.crag.crag.model.azimuth) {
         this.controls.minAzimuthAngle = this.crag.crag.model.azimuth.minimum;
         this.controls.maxAzimuthAngle = this.crag.crag.model.azimuth.maximum;
       }
 
-      this.controls.maxPolarAngle = Math.PI * 3/4;
+      this.controls.maxPolarAngle = (Math.PI * 3) / 4;
       this.controls.screenSpacePanning = true;
 
       this.controls2 = new OrbitControls(
@@ -388,7 +437,9 @@ export default {
       this.controls2.enablePan = false;
       this.controls2.enableZoom = false;
 
-      this.scene.add(new THREE.AmbientLight(0xffffff, this.crag.crag.model.light));
+      this.scene.add(
+        new THREE.AmbientLight(0xffffff, this.crag.crag.model.light)
+      );
 
       // for raycasting
       let geometry = new THREE.BufferGeometry();
@@ -411,27 +462,34 @@ export default {
       this.raycaster = new THREE.Raycaster();
       this.mouseVector = new THREE.Vector2();
 
-      window.addEventListener("resize", this.onWindowResize, false);
-      container.addEventListener("mousemove", this.onDocumentMouseMove, false);
-      container.addEventListener("mouseup", this.onDocumentMouseclick, false);
-      container.addEventListener("dblclick", this.onDocumentDoubleClick, false);
-      container.addEventListener("webglcontextlost", function(event) {
-        console.log("in context lost event handler")
-        event.preventDefault();
-        cancelRequestAnimationFrame(this.animateId);
-      }, false);
-      container.addEventListener("webglcontextrestored", this.init, false);
-      container.addEventListener("webglcontextrestored", this.animate, false);
+      window.addEventListener('resize', this.onWindowResize, false);
+      container.addEventListener('mousemove', this.onDocumentMouseMove, false);
+      container.addEventListener('mouseup', this.onDocumentMouseclick, false);
+      container.addEventListener('dblclick', this.onDocumentDoubleClick, false);
+      container.addEventListener(
+        'webglcontextlost',
+        function(event) {
+          console.log('in context lost event handler');
+          event.preventDefault();
+          cancelRequestAnimationFrame(this.animateId);
+        },
+        false
+      );
+      container.addEventListener('webglcontextrestored', this.init, false);
+      container.addEventListener('webglcontextrestored', this.animate, false);
 
-      document.addEventListener("visibilitychange", this.onDocumentVisibilityChange);
-      window.addEventListener("mousedown", () => {
+      document.addEventListener(
+        'visibilitychange',
+        this.onDocumentVisibilityChange
+      );
+      window.addEventListener('mousedown', () => {
         this.moved = false;
       });
-      window.addEventListener("touchstart", () => {
+      window.addEventListener('touchstart', () => {
         this.moved = false;
       });
-      container.addEventListener("touchend", this.onDocumentTouchEnd, false);
-      this.controls.addEventListener("change", () => {
+      container.addEventListener('touchend', this.onDocumentTouchEnd, false);
+      this.controls.addEventListener('change', () => {
         this.moved = true;
         this.camMoved = true;
         // if (this.inBounds == false){
@@ -440,7 +498,7 @@ export default {
         //   this.controls.enabled = true;
         // }
       });
-      document.addEventListener("fullscreenchange", () => {
+      document.addEventListener('fullscreenchange', () => {
         const element = document.fullscreenElement;
         if (!element) {
           this.fullscreenView = false;
@@ -458,7 +516,7 @@ export default {
         this.renderer.render(this.scene, this.camera);
 
         this.camDistance =
-          this.camera.position.distanceTo(this.origin).toFixed(0) + " ft";
+          this.camera.position.distanceTo(this.origin).toFixed(0) + ' ft';
         // document.getElementById("camera-distance").innerHTML = this.camDistance;
 
         this.checkAnnotationDistance();
@@ -469,8 +527,18 @@ export default {
         this.renderer.clearDepth(); // important!
         this.renderer.setScissorTest(true);
         if (this.fullscreenView) {
-          this.renderer.setScissor(20, window.innerHeight - this.insetHeight - 20, this.insetWidth, this.insetHeight);
-          this.renderer.setViewport(20, window.innerHeight - this.insetHeight - 20, this.insetWidth, this.insetHeight);
+          this.renderer.setScissor(
+            20,
+            window.innerHeight - this.insetHeight - 20,
+            this.insetWidth,
+            this.insetHeight
+          );
+          this.renderer.setViewport(
+            20,
+            window.innerHeight - this.insetHeight - 20,
+            this.insetWidth,
+            this.insetHeight
+          );
         } else {
           this.renderer.setScissor(
             20,
@@ -493,10 +561,10 @@ export default {
     },
     onDocumentVisibilityChange() {
       if (document[hidden]) {
-          this.play = false;
-        } else {
-          this.play = true;
-        }
+        this.play = false;
+      } else {
+        this.play = true;
+      }
     },
     onWindowResize: function() {
       if (this.play) {
@@ -505,7 +573,9 @@ export default {
         // this.renderer.setSize(window.innerWidth, window.innerHeight);
 
         if (this.fullscreenTrigger) {
-          setTimeout(()=>{ this.fullscreenTrigger = false; }, 1000);
+          setTimeout(() => {
+            this.fullscreenTrigger = false;
+          }, 1000);
 
           this.renderer.setSize(window.innerWidth, window.innerHeight);
         } else {
@@ -525,7 +595,7 @@ export default {
       for (let i in this.loadedModels) {
         if (this.loadedModels[i].name === this.cragId) {
           this.fromStore = true;
-          this.modelIndex = i
+          this.modelIndex = i;
           break;
         }
       }
@@ -536,78 +606,53 @@ export default {
 
       // await this.checkModel()
 
-      // if (this.fromStore) {
-
-        // let objectURL = URL.createObjectURL(this.crag.crag.modelLocation)
-        // loader.load(
-        //   objectURL,
-        //   gltf => {
-        //     this.mesh = gltf.scene.children[0];
-        //     this.mesh.layers.set(1);
-        //     this.mesh.scale.set(
-        //       this.meshScale,
-        //       this.meshScale,
-        //       this.meshScale
-        //     );
-        //     this.scene.add(this.mesh);
-        //   }
-        // );
-      // } else {
-        let folder = cordova.file.dataDirectory
-
+      if (this.downloaded) {
         loader.load(
-          this.crag.crag.model.lowResModelLocation,
-          gltf => {
-            this.lowMesh = gltf.scene.children[0];
-            this.lowMesh.layers.set(1);
-            this.lowMesh.scale.set(
-              this.meshScale,
-              this.meshScale,
-              this.meshScale
-            );
-            this.scene.add(this.lowMesh);
-            // this.loadDecals()
-          }
-        );
-
-        // let blob = await this.$axios({
-        //   method: 'get',
-        //   url: this.crag.crag.model.modelLocation,
-        //   responseType: 'blob'
-        // });
-        // let objectURL = URL.createObjectURL(blob.data);
-
-        loader.load(
-          folder + this.crag.crag.model.modelLocation,
-          gltf => {
+          cordova.file.dataDirectory +
+            '/files/crags/' +
+            this.$route.params.frame +
+            '/' +
+            this.$route.params.frame +
+            '.glb',
+          (gltf) => {
             this.mesh = gltf.scene.children[0];
             this.mesh.layers.set(1);
             this.mesh.scale.set(this.meshScale, this.meshScale, this.meshScale);
             this.scene.add(this.mesh);
-
           }
         );
-      //   let model = {
-      //         model: blob,
-      //         name: this.cragId
-      //       };
-      //       this.$store.commit("updateLoadedModels", model);
-      // }
+      } else {
+        loader.load(this.crag.crag.model.lowResModelLocation, (gltf) => {
+          this.lowMesh = gltf.scene.children[0];
+          this.lowMesh.layers.set(1);
+          this.lowMesh.scale.set(
+            this.meshScale,
+            this.meshScale,
+            this.meshScale
+          );
+          this.scene.add(this.lowMesh);
+        });
+
+        loader.load(this.crag.crag.model.modelLocation, (gltf) => {
+          this.mesh = gltf.scene.children[0];
+          this.mesh.layers.set(1);
+          this.mesh.scale.set(this.meshScale, this.meshScale, this.meshScale);
+          this.scene.add(this.mesh);
+        });
+      }
     },
     loadNorth() {
       let loader = new GLTFLoader();
       loader.load(
-        "https://s3-us-west-2.amazonaws.com/models-172776452117-us-west-2/north.glb",
-        gltf => {
+        'https://s3-us-west-2.amazonaws.com/models-172776452117-us-west-2/north.glb',
+        (gltf) => {
           this.north = gltf.scene.children[0];
           this.north.scale.set(5, 5, 5);
-          this.north.rotateY(
-            this.crag.crag.model.modelAngle
-          );
+          this.north.rotateY(this.crag.crag.model.modelAngle);
           this.north.layers.set(10);
           this.scene.add(this.north);
         },
-        error => {
+        (error) => {
           console.log(error);
         }
       );
@@ -626,8 +671,8 @@ export default {
           this.routePos.push(pos);
           // Sprite
           // let canvas = document.getElementById("number");
-          let canvas = document.createElement("canvas");
-          let ctx = canvas.getContext("2d");
+          let canvas = document.createElement('canvas');
+          let ctx = canvas.getContext('2d');
           let numberTexture = new THREE.CanvasTexture(canvas);
 
           let spriteMaterial = new THREE.SpriteMaterial({
@@ -636,7 +681,7 @@ export default {
             transparent: true,
             depthTest: false,
             depthWrite: false,
-            sizeAttenuation: true
+            sizeAttenuation: true,
           });
 
           // Number definition
@@ -645,25 +690,25 @@ export default {
 
           ctx.clearRect(0, 0, x, y);
 
-          ctx.fillStyle = "rgb(0, 0, 0)";
+          ctx.fillStyle = 'rgb(0, 0, 0)';
           ctx.beginPath();
           ctx.arc(x, y, radius, startAngle, endAngle);
           ctx.fill();
 
-          ctx.strokeStyle = "rgb(255, 255, 255)";
+          ctx.strokeStyle = 'rgb(255, 255, 255)';
           ctx.lineWidth = 3;
           ctx.beginPath();
           ctx.arc(x, y, radius, startAngle, endAngle);
           ctx.stroke();
 
-          ctx.fillStyle = "rgb(255, 255, 255)";
-          ctx.font = "25px sans-serif";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
+          ctx.fillStyle = 'rgb(255, 255, 255)';
+          ctx.font = '25px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
           ctx.fillText(this.crag.walls[wkey].routes[rkey].routeNum, x, y);
 
           let sprite = new THREE.Sprite(spriteMaterial);
-          sprite.material.color.set(this.groupColors[wkey])
+          sprite.material.color.set(this.groupColors[wkey]);
           sprite.scale.set(1, 1, 1);
           sprite.position.set(
             this.crag.walls[wkey].routes[rkey].center.x,
@@ -692,19 +737,21 @@ export default {
             geometry.vertices.push(vertex);
           }
           var color;
-          if (this.crag.walls[wkey].routes[rkey].style === "sport") {
+          if (this.crag.walls[wkey].routes[rkey].style === 'sport') {
             color = 0x0000ff;
-          } else if (this.crag.walls[wkey].routes[rkey].style === "trad") {
+          } else if (this.crag.walls[wkey].routes[rkey].style === 'trad') {
             color = 0xff0000;
           } else {
             color = 0xffff00;
           }
           var material = new THREE.LineBasicMaterial({
-            color: color
+            color: color,
           });
           let line = new THREE.Line(geometry, material);
-          let dist =  line.computeLineDistances();
-          console.log(dist.geometry.lineDistances[dist.geometry.lineDistances.length-1])
+          let dist = line.computeLineDistances();
+          console.log(
+            dist.geometry.lineDistances[dist.geometry.lineDistances.length - 1]
+          );
           line.layers.set(2);
           this.linesGroup.add(line);
         }
@@ -724,16 +771,17 @@ export default {
       for (let akey in this.crag.walls[this.activeRoute.wall].routes[
         this.activeRoute.route
       ].anchors) {
-        if (this.crag.walls[this.activeRoute.wall].routes[
-          this.activeRoute.route
-        ].anchors) {
+        if (
+          this.crag.walls[this.activeRoute.wall].routes[this.activeRoute.route]
+            .anchors
+        ) {
           let anchors = this.crag.walls[this.activeRoute.wall].routes[
             this.activeRoute.route
           ].anchors[akey];
           // Sprite
           // let canvas = document.getElementById("number");
-          let canvas = document.createElement("canvas");
-          let ctx = canvas.getContext("2d");
+          let canvas = document.createElement('canvas');
+          let ctx = canvas.getContext('2d');
           let numberTexture = new THREE.CanvasTexture(canvas);
 
           let spriteMaterial = new THREE.SpriteMaterial({
@@ -742,7 +790,7 @@ export default {
             transparent: true,
             depthTest: false,
             depthWrite: false,
-            sizeAttenuation: true
+            sizeAttenuation: true,
           });
 
           // Number definition
@@ -751,18 +799,18 @@ export default {
 
           ctx.clearRect(0, 0, x, y);
           if (anchors.fixed) {
-            ctx.fillStyle = "rgb(0, 0, 255)";
+            ctx.fillStyle = 'rgb(0, 0, 255)';
             ctx.beginPath();
             ctx.arc(x, y, radius, startAngle, endAngle);
             ctx.fill();
           } else {
-            ctx.fillStyle = "rgb(255, 255, 0)";
+            ctx.fillStyle = 'rgb(255, 255, 0)';
             ctx.beginPath();
             ctx.arc(x, y, radius, startAngle, endAngle);
             ctx.fill();
           }
 
-          ctx.strokeStyle = "rgb(0, 0, 0)";
+          ctx.strokeStyle = 'rgb(0, 0, 0)';
           ctx.lineWidth = 3;
           ctx.beginPath();
           ctx.arc(x, y, radius, startAngle, endAngle);
@@ -863,7 +911,7 @@ export default {
             1
           );
           this.selectedPos = this.group.children.findIndex(
-            x => x.id === this.selectedObject.id
+            (x) => x.id === this.selectedObject.id
           );
 
           let vector = this.selectedObject.position.clone();
@@ -872,18 +920,18 @@ export default {
 
           vector.x = Math.round((0.5 + vector.x / 2) * canvas.width);
           vector.y = Math.round((0.5 - vector.y / 2) * canvas.height);
-          if (document.querySelector(".annotation")) {
-            let annotation = document.querySelector(".annotation");
+          if (document.querySelector('.annotation')) {
+            let annotation = document.querySelector('.annotation');
             let annotationElement = document.getElementById(
-              "annotationElement"
+              'annotationElement'
             );
             if (canvas.width - vector.x > annotationElement.clientWidth) {
-              annotation.style.top = vector.y + "px";
-              annotation.style.left = vector.x + 35 + "px";
+              annotation.style.top = vector.y + 'px';
+              annotation.style.left = vector.x + 35 + 'px';
             } else {
-              annotation.style.top = vector.y + "px";
+              annotation.style.top = vector.y + 'px';
               annotation.style.left =
-                vector.x - annotationElement.clientWidth - 35 + "px";
+                vector.x - annotationElement.clientWidth - 35 + 'px';
             }
           }
         }
@@ -937,26 +985,28 @@ export default {
           if (this.moved) return;
           if (this.activeObject != this.selectedObject) {
             // this.selectedObject.material.color.set("#ffffff");
-            this.selectedObject.scale.set(this.scaleFactor, this.scaleFactor, 1);
+            this.selectedObject.scale.set(
+              this.scaleFactor,
+              this.scaleFactor,
+              1
+            );
           }
           this.selectedObject = null;
         }
         let intersects;
-        var topNav = document.getElementsByClassName("v-app-bar");
+        var topNav = document.getElementsByClassName('v-app-bar');
         var nav = topNav[0].clientHeight;
         if (this.fullscreenView) {
-            intersects = this.getIntersects(
-              event.changedTouches[0].clientX,
-              event.changedTouches[0].clientY
-            );
-          }
-          else
-          {
-            intersects = this.getIntersects(
-              event.changedTouches[0].clientX,
-              event.changedTouches[0].clientY + nav
-            );
-          }
+          intersects = this.getIntersects(
+            event.changedTouches[0].clientX,
+            event.changedTouches[0].clientY
+          );
+        } else {
+          intersects = this.getIntersects(
+            event.changedTouches[0].clientX,
+            event.changedTouches[0].clientY + nav
+          );
+        }
         if (intersects.length > 0) {
           let res = intersects.filter(function(res) {
             return res && res.object;
@@ -964,17 +1014,17 @@ export default {
           if (res && res.object) {
             this.selectedObject = res.object;
             this.selectedPos = this.group.children.findIndex(
-              x => x.id === this.selectedObject.id
+              (x) => x.id === this.selectedObject.id
             );
 
             let newRoute = this.routePos[this.selectedPos];
-            this.$store.commit("updateActiveRoute", newRoute);
+            this.$store.commit('updateActiveRoute', newRoute);
           }
         } else {
-          this.$store.commit("updateActiveRoute", null);
+          this.$store.commit('updateActiveRoute', null);
         }
         this.timeout = setTimeout(function() {
-            clearTimeout(this.timeout);
+          clearTimeout(this.timeout);
         }, 200);
       }
       this.lastTap = currentTime;
@@ -983,12 +1033,12 @@ export default {
       if (this.moved) return;
       if (this.selectedObject) {
         let newRoute = this.routePos[this.selectedPos];
-        this.$store.commit("updateActiveRoute", newRoute);
+        this.$store.commit('updateActiveRoute', newRoute);
       } else {
-        this.$store.commit("updateActiveRoute", null);
+        this.$store.commit('updateActiveRoute', null);
       }
     },
-    onDocumentDoubleClick () {
+    onDocumentDoubleClick() {
       if (this.moved) return;
       this.checkMeshIntersection();
       if (!this.moved && this.intersection.intersects) {
@@ -996,7 +1046,7 @@ export default {
       }
     },
     setControlPoint(input) {
-      this.controls.target = input
+      this.controls.target = input;
       this.controls.update();
     },
     checkAnnotationDistance: function() {
@@ -1005,18 +1055,15 @@ export default {
           this.camera.position.distanceTo(this.controls.target).toFixed(0) > 70
         ) {
           this.scaleFactor = 3;
-        }
-        else if (
+        } else if (
           this.camera.position.distanceTo(this.controls.target).toFixed(0) > 40
         ) {
           this.scaleFactor = 2;
-        }
-        else if (
+        } else if (
           this.camera.position.distanceTo(this.controls.target).toFixed(0) > 20
-        ){
+        ) {
           this.scaleFactor = 1;
-        }
-        else {
+        } else {
           this.scaleFactor = 0.5;
         }
         for (let skey in this.group.children) {
@@ -1024,7 +1071,6 @@ export default {
             this.group.children[skey] != this.selectedObject &&
             this.group.children[skey] != this.activeObject
           ) {
-
             this.group.children[skey].scale.set(
               this.scaleFactor,
               this.scaleFactor,
@@ -1050,24 +1096,24 @@ export default {
       }
     },
     createScale() {
-      var canvas = document.getElementById("number");
+      var canvas = document.getElementById('number');
       var x = 16;
       var y = 16;
       var radius = 15;
       var startAngle = 0;
       var endAngle = Math.PI * 2;
 
-      var ctx = canvas.getContext("2d");
+      var ctx = canvas.getContext('2d');
 
       //circle
       ctx.clearRect(0, 0, 36, 32);
 
-      ctx.fillStyle = "rgb(0, 0, 0)";
+      ctx.fillStyle = 'rgb(0, 0, 0)';
       ctx.beginPath();
       ctx.arc(x, y, radius, startAngle, endAngle);
       ctx.fill();
 
-      ctx.strokeStyle = "rgb(255, 255, 255)";
+      ctx.strokeStyle = 'rgb(255, 255, 255)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.arc(x, y, radius, startAngle, endAngle);
@@ -1079,12 +1125,12 @@ export default {
       ctx.lineTo(32, 32);
       ctx.stroke();
 
-      ctx.strokeStyle = "rgb(255, 255, 255)";
-      ctx.fillStyle = "rgb(255, 255, 255)";
-      ctx.font = 16 + "px sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("x", x, y);
+      ctx.strokeStyle = 'rgb(255, 255, 255)';
+      ctx.fillStyle = 'rgb(255, 255, 255)';
+      ctx.font = 16 + 'px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('x', x, y);
     },
     checkAnnotationOpacity() {
       if (!this.mesh || !this.group) return;
@@ -1112,7 +1158,7 @@ export default {
     setFullscreen() {
       this.fullscreenView = true;
       this.fullscreenTrigger = true;
-      const canvas = document.getElementById("canvas");
+      const canvas = document.getElementById('canvas');
       canvas.requestFullscreen();
       this.onWindowResize();
     },
@@ -1145,7 +1191,7 @@ export default {
     this.loadLines();
     this.play = true;
     this.animate();
-  }
+  },
 };
 </script>
 

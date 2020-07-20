@@ -18,14 +18,6 @@
             <v-list-item-title>login</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item v-if="isAdministrator" to="/editor" router>
-          <v-list-item-action>
-            <v-icon>fa-edit</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>editor</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
         <v-list-item v-for="(item, i) in items" :key="i" :to="item.to" router>
           <v-list-item-action>
             <v-icon>{{ item.icon }}</v-icon>
@@ -49,13 +41,7 @@
         <component :is="sidebar" />
       </div>
     </v-navigation-drawer>
-    <v-app-bar
-      color="primary"
-      dark
-      fixed
-      app
-      clipped-left
-    >
+    <v-app-bar color="primary" dark fixed app clipped-left>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <img style="max-width:50px" src="@/assets/ClimbAssist_Logo_img.png" />
       <v-flex hidden-sm-and-down shrink>
@@ -65,13 +51,8 @@
       <navbar />
       <v-spacer />
       <v-bottom-sheet v-if="!editor" inset v-model="showSheet">
-
         <v-btn slot="activator" light @click="showSheet = !showSheet">
-          <v-badge
-          color="red"
-          bottom
-          right
-        >
+          <v-badge color="red" bottom right>
             <template v-slot:badge>
               <span v-if="resetButton">!</span>
             </template>
@@ -195,55 +176,60 @@
   </v-app>
 </template>
 <script>
-import DefaultView from "./components/sidebar/DefaultView.vue";
-import AreaView from "./components/sidebar/AreaView.vue";
-import FrameView from "./components/sidebar/FrameView.vue";
-import MapViewArea from "./components/sidebar/MapViewArea.vue";
-import MapViewCrag from "./components/sidebar/MapViewCrag.vue";
-import EditorCragView from "./components/sidebar/EditorCragView.vue";
-import EditorRouteView from "./components/sidebar/EditorRouteView.vue";
-import Navbar from "./components/Navbar.vue";
-import BottomNavbar from "./components/BottomNavbar.vue";
-import Snackbar from "./components/Snackbar.vue";
-import { mapGetters } from "vuex";
-import { sampleData } from "./mixins/sampleData.js";
-import { fetch } from "./mixins/fetchData.js";
+import DefaultView from './components/sidebar/DefaultView.vue';
+import AreaView from './components/sidebar/AreaView.vue';
+import FrameView from './components/sidebar/FrameView.vue';
+import MapViewArea from './components/sidebar/MapViewArea.vue';
+import MapViewCrag from './components/sidebar/MapViewCrag.vue';
+import EditorCragView from './components/sidebar/EditorCragView.vue';
+import EditorRouteView from './components/sidebar/EditorRouteView.vue';
+import Navbar from './components/Navbar.vue';
+import BottomNavbar from './components/BottomNavbar.vue';
+import Snackbar from './components/Snackbar.vue';
+import { mapGetters } from 'vuex';
+import { sampleData } from './mixins/sampleData.js';
+import { fetch } from './mixins/fetchData.js';
 export default {
-  name: "App",
+  name: 'App',
   data: () => ({
     drawer: null,
     items: [
       {
-        icon: "fa-home",
-        title: "home",
-        to: "/"
+        icon: 'fa-home',
+        title: 'home',
+        to: '/',
       },
       {
-        icon: "fa-list",
-        title: "list",
-        to: "/list"
+        icon: 'fa-list',
+        title: 'list',
+        to: '/list',
       },
       {
-        icon: "fa-map",
-        title: "map",
-        to: "/map"
+        icon: 'fa-map',
+        title: 'map',
+        to: '/map',
       },
       {
-        icon: "fa-folder",
-        title: "file",
-        to: "/file-test"
-      }
+        icon: 'fa-folder',
+        title: 'file',
+        to: '/file-test',
+      },
+      {
+        icon: 'fa-folder',
+        title: 'downloads',
+        to: '/downloads',
+      },
     ],
     showSheet: false,
-    frameTabs: "info",
-    filterTextSet: "",
+    frameTabs: 'info',
+    filterTextSet: '',
     filterTemp: {
       uiaa_grade: [0, 16],
       yds_grade: [1, 16],
       boulder: true,
       sport: true,
-      trad: true
-    }
+      trad: true,
+    },
   }),
   mixins: [sampleData, fetch],
   computed: {
@@ -270,7 +256,7 @@ export default {
       }
     },
     ...mapGetters({
-      filteredRoutes: "filteredRoutes"
+      filteredRoutes: 'filteredRoutes',
     }),
     resetButton() {
       if (
@@ -301,27 +287,27 @@ export default {
       } else {
         return true;
       }
-    }
+    },
   },
   methods: {
     setAgreement() {
       this.$store.commit(
-        "updateMessage",
-        "By using this site you agree to the"
+        'updateMessage',
+        'By using this site you agree to the'
       );
-      this.$store.commit("updateType", "dark");
-      this.$store.commit("updateTimeout", 10000);
-      this.$store.commit("updateSnackbar", true);
-      this.$store.commit("updateLink", "/terms");
-      this.$store.commit("updateLinkMessage", "terms and conditions");
+      this.$store.commit('updateType', 'dark');
+      this.$store.commit('updateTimeout', 10000);
+      this.$store.commit('updateSnackbar', true);
+      this.$store.commit('updateLink', '/terms');
+      this.$store.commit('updateLinkMessage', 'terms and conditions');
     },
     setTimer() {
       setTimeout(() => {
-        this.$store.commit("updateFilterText", this.filterTextSet);
+        this.$store.commit('updateFilterText', this.filterTextSet);
       }, 500);
     },
     setFilter() {
-      this.$store.commit("updateFilter", this.filterTemp);
+      this.$store.commit('updateFilter', this.filterTemp);
       this.showSheet = false;
     },
     resetFilter() {
@@ -330,46 +316,50 @@ export default {
         yds_grade: [1, 16],
         boulder: true,
         sport: true,
-        trad: true
+        trad: true,
       };
-      this.$store.commit("updateFilter", this.filterTemp);
+      this.$store.commit('updateFilter', this.filterTemp);
       this.showSheet = false;
     },
     string_to_slug(str) {
-      str = str.replace(/^\s+|\s+$/g, ""); // trim
+      str = str.replace(/^\s+|\s+$/g, ''); // trim
       str = str.toLowerCase();
 
       // remove accents, swap ñ for n, etc
-      const from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
-      const to = "aaaaeeeeiiiioooouuuunc------";
+      const from = 'àáäâèéëêìíïîòóöôùúüûñç·/_,:;';
+      const to = 'aaaaeeeeiiiioooouuuunc------';
       for (let i = 0, l = from.length; i < l; i++) {
-        str = str.replace(new RegExp(from.charAt(i), "g"), to.charAt(i));
+        str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
       }
 
       str = str
-        .replace(/[^a-z0-9 -]/g, "") // remove invalid chars
-        .replace(/\s+/g, "-") // collapse whitespace and replace by -
-        .replace(/-+/g, "-"); // collapse dashes
+        .replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+        .replace(/\s+/g, '-') // collapse whitespace and replace by -
+        .replace(/-+/g, '-'); // collapse dashes
 
       return str;
     },
     async getUser() {
-      const userData = await cordova.plugin.http.get("https://www.climbassist.com/v1/user", {}, {}, 
-      (response)=> {
-        //success
-        let user = JSON.parse(response.data).data
-        this.$store.commit("updateUsername", user.username);
-        this.$store.commit("updateEmail", user.email);
-        this.$store.commit(
-          "updateIsAdministrator",
-          userData.data.isAdministrator
-        );
-      },
-      (response)=> {
-        //fail user not loggged in
-        console.log(response);
-      });
-    }
+      const userData = await cordova.plugin.http.get(
+        'https://www.climbassist.com/v1/user',
+        {},
+        {},
+        (response) => {
+          //success
+          let user = JSON.parse(response.data).data;
+          this.$store.commit('updateUsername', user.username);
+          this.$store.commit('updateEmail', user.email);
+          this.$store.commit(
+            'updateIsAdministrator',
+            userData.data.isAdministrator
+          );
+        },
+        (response) => {
+          //fail user not loggged in
+          console.log(response);
+        }
+      );
+    },
   },
   components: {
     defaultV: DefaultView,
@@ -381,7 +371,7 @@ export default {
     editorrouteV: EditorRouteView,
     navbar: Navbar,
     bottomNav: BottomNavbar,
-    snackbar: Snackbar
+    snackbar: Snackbar,
   },
   created() {
     // this.getUser();
@@ -389,7 +379,6 @@ export default {
   },
   mounted() {
     // this.setAgreement();
-
     // local testing
     // for (let i in this.countries) {
     //   this.$store.commit("updateRoutes", this.countries[i]);
@@ -399,13 +388,13 @@ export default {
     //   "updateLoadedCrags",
     //   this.countries[0].regions[0].areas[0].subAreas[0].crags[1]
     // );
-  }
+  },
 };
 </script>
 
 <style>
 #app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
