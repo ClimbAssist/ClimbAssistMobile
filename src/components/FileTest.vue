@@ -4,6 +4,8 @@
       <v-btn @click="getDirectory()"> Get Directory</v-btn>
       <p>file path: {{ path }}</p>
       <p>Directory Entry: {{ dirEntry }}</p>
+      <p>size: {{ size }}</p>
+      <p>Last Modified: {{ lastModified }}</p>
       <p>Entries: {{ entries }}</p>
       <p>SubEntries: {{ subEntries }}</p>
     </v-card>
@@ -38,6 +40,8 @@ export default {
       json: undefined,
       entries: undefined,
       subEntries: undefined,
+      lastModified: undefined,
+      size: undefined,
     };
   },
   computed: {
@@ -92,8 +96,14 @@ export default {
             // Get a list of all the entries in the directory
             directoryReader.readEntries(
               (entries) => {
-                console.log(entries);
                 this.subEntries = entries;
+                entries[0].file((file) => {
+                  console.log('file');
+                  console.log(file);
+                  console.log(file.lastModified);
+                  this.lastModified = new Date(file.lastModified);
+                  this.size = file.size;
+                });
               },
               (error) => {
                 console.log(error);
