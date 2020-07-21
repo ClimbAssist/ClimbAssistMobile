@@ -121,14 +121,27 @@ export default {
       );
     },
     organizeCrag(crag) {
+      if (!crag.walls) {
+        crag.walls = [];
+      }
+
       for (let wi in crag.walls) {
+        if (!crag.walls[wi].routes) {
+          crag.walls[wi].routes = [];
+        }
         for (let ri in crag.walls[wi].routes) {
           crag.walls[wi].routes[ri].points = [];
           crag.walls[wi].routes[ri].distance = 0;
+          if (!crag.walls[wi].routes[ri].pitches) {
+            crag.walls[wi].routes[ri].pitches = [];
+          }
           for (let pi in crag.walls[wi].routes[ri].pitches) {
             if (crag.walls[wi].routes[ri].pitches[pi].distance) {
               crag.walls[wi].routes[ri].distance +=
                 crag.walls[wi].routes[ri].pitches[pi].distance;
+            }
+            if (!crag.walls[wi].routes[ri].pitches[pi].points) {
+              crag.walls[wi].routes[ri].pitches[pi].points = [];
             }
             crag.walls[wi].routes[ri].points = crag.walls[wi].routes[
               ri

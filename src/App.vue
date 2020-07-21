@@ -51,14 +51,21 @@
       <navbar />
       <v-spacer />
       <v-bottom-sheet v-if="!editor" inset v-model="showSheet">
-        <v-btn slot="activator" light @click="showSheet = !showSheet">
-          <v-badge color="red" bottom right>
-            <template v-slot:badge>
-              <span v-if="resetButton">!</span>
-            </template>
-            <v-icon color="primary">fa-sliders-h</v-icon>
-          </v-badge>
-        </v-btn>
+        <template v-slot:activator="{ on }">
+          <v-btn v-on="on" light small fab aria-label="Route Filter">
+            <v-badge :value="resetButton" color="red" right bottom>
+              <template v-slot:badge>
+                <span>!</span>
+              </template>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                  <v-icon v-on="on" color="primary">fa-sliders-h</v-icon>
+                </template>
+                <span>Filter</span>
+              </v-tooltip>
+            </v-badge>
+          </v-btn>
+        </template>
 
         <v-container class="sheet-front">
           <v-layout wrap>
@@ -77,7 +84,7 @@
               <v-checkbox :label="`Trad`" v-model="filterTemp.trad" />
             </v-flex>
           </v-layout>
-          <v-layout v-if="filterTemp.boulder" wrap>
+          <v-layout v-if="filterTemp.boulder" wrap row fill-height align-center>
             <v-flex xs6 sm2>
               <v-card-text>
                 <h3>UIAA Grade:</h3>
@@ -85,15 +92,19 @@
             </v-flex>
             <v-flex xs3 sm2>
               <v-card-text>
-                <v-text-field
+                V {{ filterTemp.uiaa_grade[0] }}
+
+                <!-- <v-text-field
+                  readonly
                   prefix="V"
                   v-model="filterTemp.uiaa_grade[0]"
                   class="mt-0 pt-0"
+                  validate-on-blur
                   hide-details
                   single-line
                   type="number"
                   style="width: 50px"
-                ></v-text-field>
+                ></v-text-field> -->
               </v-card-text>
             </v-flex>
             <v-flex xs12 sm6 order-xs3 order-sm2>
@@ -106,35 +117,56 @@
             </v-flex>
             <v-flex xs3 sm2 order-xs2 order-sm3>
               <v-card-text>
-                <v-text-field
+                V {{ filterTemp.uiaa_grade[1] }}
+                <!-- <v-text-field
                   v-model="filterTemp.uiaa_grade[1]"
+                  validate-on-blur
                   prefix="V"
                   class="mt-0 pt-0"
                   hide-details
                   single-line
                   type="number"
                   style="width: 50px"
-                />
+                /> -->
               </v-card-text>
             </v-flex>
           </v-layout>
-          <v-layout v-if="filterTemp.sport || filterTemp.trad" wrap>
-            <v-flex xs12 sm2>
+          <v-layout
+            v-if="filterTemp.sport || filterTemp.trad"
+            wrap
+            row
+            align-center
+          >
+            <v-flex xs6 sm2>
               <v-card-text>
                 <h3>YDS Grade:</h3>
               </v-card-text>
             </v-flex>
-            <v-flex xs6 sm2>
+            <v-flex xs3 sm2>
               <v-card-text>
-                <v-text-field
+                5.{{ filterTemp.yds_grade[0] }}
+
+                <!-- <v-select
                   prefix="5."
+                  :items="numList"
                   v-model="filterTemp.yds_grade[0]"
                   class="mt-0 pt-0"
                   hide-details
                   single-line
                   type="number"
                   style="width: 60px"
-                ></v-text-field>
+                /> -->
+
+                <!-- <v-text-field
+                  prefix="5."
+                  v-model="filterTemp.yds_grade[0]"
+                  class="mt-0 pt-0"
+                  validate-on-blur
+                  hide-details
+                  single-line
+                  type="number"
+                  style="width: 60px"
+                ></v-text-field> -->
               </v-card-text>
             </v-flex>
             <v-flex xs12 sm6 order-xs3 order-sm2>
@@ -145,23 +177,43 @@
                 :step="1"
               />
             </v-flex>
-            <v-flex xs6 sm2 order-xs2 order-sm3>
+            <v-flex xs3 sm2 order-xs2 order-sm3>
               <v-card-text>
-                <v-text-field
-                  v-model="filterTemp.yds_grade[1]"
+                5.{{ filterTemp.yds_grade[1] }}
+
+                <!--   <v-select
                   prefix="5."
+                  :items="numList"
+                  v-model="filterTemp.yds_grade[1]"
                   class="mt-0 pt-0"
                   hide-details
                   single-line
                   type="number"
                   style="width: 60px"
-                />
+                /> -->
+
+                <!-- <v-text-field
+                  v-model="filterTemp.yds_grade[1]"
+                  prefix="5."
+                  class="mt-0 pt-0"
+                  validate-on-blur
+                  hide-details
+                  single-line
+                  type="number"
+                  style="width: 60px"
+                /> -->
               </v-card-text>
             </v-flex>
           </v-layout>
           <v-layout justify-end row>
-            <v-btn v-show="resetButton" @click="resetFilter()">reset</v-btn>
-            <v-btn v-show="submitButton" @click="setFilter()" color="primary"
+            <v-btn class="mx-2" v-show="resetButton" @click="resetFilter()"
+              >reset</v-btn
+            >
+            <v-btn
+              class="mx-2"
+              v-show="submitButton"
+              @click="setFilter()"
+              color="primary"
               >submit</v-btn
             >
           </v-layout>

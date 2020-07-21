@@ -43,21 +43,23 @@
     <canvas id="number" width="36" height="32"></canvas>
     <div id="scale">
       <p>{{ scaleSize }} m ({{ scaleSizeFt }} ft)</p>
-      <!-- <p>{{ inBounds }}</p> -->
     </div>
-    <!-- <v-btn class="viewer-btn" v-if="camMoved" @click="resetCam()">reset</v-btn> -->
 
     <div
       class="annotation"
       id="annotationElement"
       v-if="selectedObject && routeShow"
     >
-      {{
-        crag.walls[routePos[selectedPos].wall].routes[
-          routePos[selectedPos].route
-        ].name
-      }}
-      5.{{
+      <span
+        v-if="
+          crag.walls[routePos[selectedPos].wall].routes[
+            routePos[selectedPos].route
+          ].style === 'boulder'
+        "
+        >V</span
+      >
+      <span v-else> 5.</span
+      >{{
         crag.walls[routePos[selectedPos].wall].routes[
           routePos[selectedPos].route
         ].grade
@@ -86,48 +88,79 @@
         pitches
       </span>
     </div>
-    <v-sheet row class="route-info" id="routeInfo" v-if="activeRoute">
+    <v-sheet
+      row
+      class="route-info"
+      id="routeInfo"
+      v-if="activeRoute"
+      max-height="25%"
+    >
       <v-card-text>
-        <p>
-          {{ crag.walls[activeRoute.wall].routes[activeRoute.route].name }} 5.{{
-            crag.walls[activeRoute.wall].routes[activeRoute.route].grade
-          }}{{
-            crag.walls[activeRoute.wall].routes[activeRoute.route].gradeModifier
-          }}
-          {{ crag.walls[activeRoute.wall].routes[activeRoute.route].style }}
-          <span
-            v-if="
-              crag.walls[activeRoute.wall].routes[activeRoute.route].pitches
-                .length > 1
-            "
-          >
-            {{
-              crag.walls[activeRoute.wall].routes[activeRoute.route].pitches
-                .length
-            }}
-            pitches
-          </span>
-        </p>
-        <p>
+        <h3>
+          {{ crag.walls[activeRoute.wall].routes[activeRoute.route].name }}
+        </h3>
+        <span
+          v-if="
+            crag.walls[activeRoute.wall].routes[activeRoute.route].style ===
+              'boulder'
+          "
+          >V</span
+        ><span
+          v-if="
+            crag.walls[activeRoute.wall].routes[activeRoute.route].style ===
+              'trad' ||
+              crag.walls[activeRoute.wall].routes[activeRoute.route].style ===
+                'sport'
+          "
+          >5.</span
+        >{{ crag.walls[activeRoute.wall].routes[activeRoute.route].grade
+        }}{{
+          crag.walls[activeRoute.wall].routes[activeRoute.route].gradeModifier
+        }}
+        {{ crag.walls[activeRoute.wall].routes[activeRoute.route].style }}
+        {{ crag.walls[activeRoute.wall].routes[activeRoute.route].protection }}
+        <span
+          v-if="
+            crag.walls[activeRoute.wall].routes[activeRoute.route].pitches
+              .length > 1
+          "
+        >
           {{
-            crag.walls[activeRoute.wall].routes[activeRoute.route].protection
+            crag.walls[activeRoute.wall].routes[activeRoute.route].pitches
+              .length
           }}
+          pitches
+        </span>
+
+        <p
+          v-if="
+            crag.walls[activeRoute.wall].routes[activeRoute.route].description
+          "
+        >
+          {{
+            crag.walls[activeRoute.wall].routes[activeRoute.route].description
+          }}
+        </p>
+
+        <p></p>
+        <p
+          v-for="(pitch, pi) in crag.walls[activeRoute.wall].routes[
+            activeRoute.route
+          ].pitches"
+          :key="pi"
+        >
           <span
             v-if="
               crag.walls[activeRoute.wall].routes[activeRoute.route].pitches
                 .length > 1
             "
           >
-            {{
-              crag.walls[activeRoute.wall].routes[activeRoute.route].description
-            }}
+            P{{ pi + 1 }}:
           </span>
-          <span v-else>
-            {{
-              crag.walls[activeRoute.wall].routes[activeRoute.route].pitches[0]
-                .description
-            }}
-          </span>
+          {{
+            crag.walls[activeRoute.wall].routes[activeRoute.route].pitches[pi]
+              .description
+          }}
         </p>
       </v-card-text>
     </v-sheet>
@@ -404,6 +437,8 @@ export default {
       this.camera2.layers.enable(10); // north
 
       this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      this.renderer.gammaOutput = true;
+      this.renderer.gammaFactor = 2.2;
       this.renderer.setSize(container.clientWidth, container.clientHeight);
       container.appendChild(this.renderer.domElement);
 
@@ -413,8 +448,6 @@ export default {
       this.lastTarget = new THREE.Vector3();
 
       // set based on model
-      console.info('azimuth');
-      console.log(this.crag.crag.model.azimuth);
       if (this.crag.crag.model.azimuth) {
         this.controls.minAzimuthAngle = this.crag.crag.model.azimuth.minimum;
         this.controls.maxAzimuthAngle = this.crag.crag.model.azimuth.maximum;
@@ -618,6 +651,7 @@ export default {
             this.mesh = gltf.scene.children[0];
             this.mesh.layers.set(1);
             this.mesh.scale.set(this.meshScale, this.meshScale, this.meshScale);
+            this.mesh.rotateY(this.crag.crag.model.modelAngle);
             this.scene.add(this.mesh);
           }
         );
@@ -630,6 +664,7 @@ export default {
             this.meshScale,
             this.meshScale
           );
+          this.lowMesh.rotateY(this.crag.crag.model.modelAngle);
           this.scene.add(this.lowMesh);
         });
 
@@ -637,6 +672,7 @@ export default {
           this.mesh = gltf.scene.children[0];
           this.mesh.layers.set(1);
           this.mesh.scale.set(this.meshScale, this.meshScale, this.meshScale);
+          this.mesh.rotateY(this.crag.crag.model.modelAngle);
           this.scene.add(this.mesh);
         });
       }
@@ -644,7 +680,7 @@ export default {
     loadNorth() {
       let loader = new GLTFLoader();
       loader.load(
-        'https://s3-us-west-2.amazonaws.com/models-172776452117-us-west-2/north.glb',
+        require('@/assets/north.glb'),
         (gltf) => {
           this.north = gltf.scene.children[0];
           this.north.scale.set(5, 5, 5);
@@ -665,60 +701,64 @@ export default {
       const startAngle = 0;
       const endAngle = Math.PI * 2;
       for (let wkey in this.crag.walls) {
-        let idx = 1;
         for (let rkey in this.crag.walls[wkey].routes) {
           let pos = { wall: parseInt(wkey), route: parseInt(rkey) };
           this.routePos.push(pos);
-          // Sprite
-          // let canvas = document.getElementById("number");
-          let canvas = document.createElement('canvas');
-          let ctx = canvas.getContext('2d');
-          let numberTexture = new THREE.CanvasTexture(canvas);
+          if (this.crag.walls[wkey].routes[rkey].center) {
+            // Sprite
+            // let canvas = document.getElementById("number");
+            let canvas = document.createElement('canvas');
+            let ctx = canvas.getContext('2d');
+            let numberTexture = new THREE.CanvasTexture(canvas);
 
-          let spriteMaterial = new THREE.SpriteMaterial({
-            map: numberTexture,
-            alphaTest: 0.5,
-            transparent: true,
-            depthTest: false,
-            depthWrite: false,
-            sizeAttenuation: true,
-          });
+            let spriteMaterial = new THREE.SpriteMaterial({
+              map: numberTexture,
+              alphaTest: 0.5,
+              transparent: true,
+              depthTest: false,
+              depthWrite: false,
+              sizeAttenuation: true,
+            });
 
-          // Number definition
-          ctx.canvas.width = 64;
-          ctx.canvas.height = 64;
+            // Number definition
+            ctx.canvas.width = 64;
+            ctx.canvas.height = 64;
 
-          ctx.clearRect(0, 0, x, y);
+            ctx.clearRect(0, 0, x, y);
 
-          ctx.fillStyle = 'rgb(0, 0, 0)';
-          ctx.beginPath();
-          ctx.arc(x, y, radius, startAngle, endAngle);
-          ctx.fill();
+            ctx.fillStyle = 'rgb(0, 0, 0)';
+            ctx.beginPath();
+            ctx.arc(x, y, radius, startAngle, endAngle);
+            ctx.fill();
 
-          ctx.strokeStyle = 'rgb(255, 255, 255)';
-          ctx.lineWidth = 3;
-          ctx.beginPath();
-          ctx.arc(x, y, radius, startAngle, endAngle);
-          ctx.stroke();
+            ctx.strokeStyle = 'rgb(255, 255, 255)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(x, y, radius, startAngle, endAngle);
+            ctx.stroke();
 
-          ctx.fillStyle = 'rgb(255, 255, 255)';
-          ctx.font = '25px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(this.crag.walls[wkey].routes[rkey].routeNum, x, y);
+            ctx.fillStyle = 'rgb(255, 255, 255)';
+            ctx.font = '25px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(this.crag.walls[wkey].routes[rkey].routeNum, x, y);
 
-          let sprite = new THREE.Sprite(spriteMaterial);
-          sprite.material.color.set(this.groupColors[wkey]);
-          sprite.scale.set(1, 1, 1);
-          sprite.position.set(
-            this.crag.walls[wkey].routes[rkey].center.x,
-            this.crag.walls[wkey].routes[rkey].center.y,
-            this.crag.walls[wkey].routes[rkey].center.z
-          );
-          sprite.layers.set(2);
+            let sprite = new THREE.Sprite(spriteMaterial);
+            sprite.material.color.set(this.groupColors[wkey]);
+            sprite.scale.set(1, 1, 1);
+            sprite.position.set(
+              this.crag.walls[wkey].routes[rkey].center.x,
+              this.crag.walls[wkey].routes[rkey].center.y,
+              this.crag.walls[wkey].routes[rkey].center.z
+            );
+            sprite.layers.set(2);
 
-          this.group.add(sprite);
-          idx++;
+            this.group.add(sprite);
+          } else {
+            let sprite = new THREE.Sprite();
+            sprite.visible = false;
+            this.group.add(sprite);
+          }
         }
       }
       this.scene.add(this.group);
@@ -748,10 +788,10 @@ export default {
             color: color,
           });
           let line = new THREE.Line(geometry, material);
-          let dist = line.computeLineDistances();
-          console.log(
-            dist.geometry.lineDistances[dist.geometry.lineDistances.length - 1]
-          );
+          // let dist = line.computeLineDistances();
+          // console.log(
+          //   dist.geometry.lineDistances[dist.geometry.lineDistances.length - 1]
+          // );
           line.layers.set(2);
           this.linesGroup.add(line);
         }
@@ -768,16 +808,16 @@ export default {
       const startAngle = 0;
       const endAngle = Math.PI * 2;
 
-      for (let akey in this.crag.walls[this.activeRoute.wall].routes[
+      for (let pkey in this.crag.walls[this.activeRoute.wall].routes[
         this.activeRoute.route
-      ].anchors) {
+      ].pitches) {
         if (
           this.crag.walls[this.activeRoute.wall].routes[this.activeRoute.route]
-            .anchors
+            .pitches[pkey].anchors
         ) {
           let anchors = this.crag.walls[this.activeRoute.wall].routes[
             this.activeRoute.route
-          ].anchors[akey];
+          ].pitches[pkey].anchors;
           // Sprite
           // let canvas = document.getElementById("number");
           let canvas = document.createElement('canvas');
@@ -823,7 +863,7 @@ export default {
           // ctx.fillText(parseInt(rkey) + 1, x, y);
 
           let sprite = new THREE.Sprite(spriteMaterial);
-          sprite.scale.set(1, 1, 1);
+          sprite.scale.set(0.5, 0.5, 0.5);
           // if (this.currentPosition && this.activeRoute[1] == rkey) {
           //   sprite.position.copy(this.currentPosition);
           // } else {
@@ -1217,6 +1257,10 @@ export default {
   top: 125px;
   color: #ffffff;
   left: 25px;
+}
+#routeInfo {
+  overflow: auto;
+  text-align: left;
 }
 .fullscreen-btn {
   position: absolute;

@@ -1,199 +1,280 @@
 <template>
   <v-container>
-    <v-btn v-if="!downloaded" @click="downloadFiles()" :disabled="downlading"
-      >download</v-btn
-    >
-    <v-container>
-      <v-img :src="crag.crag.imageLocation" aspect-ratio="2" contain lazy>
-        <v-layout
-          slot="placeholder"
-          fill-height
-          align-center
-          justify-center
-          ma-0
+    <v-flex xs12 sm10 offset-sm1>
+      <v-card>
+        <v-btn
+          v-if="!downloaded"
+          @click="downloadFiles()"
+          :disabled="downlading"
+          >download</v-btn
         >
-          <v-progress-circular
-            indeterminate
-            color="grey lighten-5"
-          ></v-progress-circular>
-        </v-layout>
-      </v-img>
-    </v-container>
-    <v-container>
-      <v-layout row>
-        <v-flex xs12 sm2 offset-sm1>
-          <v-card-text>
-            <h3 class="text-xs-right">Description:</h3>
-          </v-card-text>
-        </v-flex>
-        <v-flex xs12 s8>
-          <v-card-text>
-            <p class="text-xs-left">{{ crag.crag.description }}</p>
-          </v-card-text>
-        </v-flex>
-      </v-layout>
-      <v-layout row wrap>
-        <v-flex xs12 sm2 offset-sm1>
-          <v-card-text>
-            <h3 class="text-xs-right">Routes:</h3>
-          </v-card-text>
-        </v-flex>
-        <v-flex xs4 offset-sm1>
-          <v-card-text v-if="crag.trad">
-            <p class="text-xs-left">
-              {{ crag.trad }} <span class="trad-style">Trad</span>
-            </p>
-          </v-card-text>
-        </v-flex>
-        <v-flex xs4>
-          <v-card-text v-if="crag.sport">
-            <p class="text-xs-left">
-              {{ crag.sport }} <span class="sport-style">Sport</span>
-            </p>
-          </v-card-text>
-        </v-flex>
-        <v-flex xs4>
-          <v-card-text v-if="crag.boulder">
-            <p class="text-xs-left">
-              {{ crag.boulder }} <span class="boulder-style">Boulder</span>
-            </p>
-          </v-card-text>
-        </v-flex>
-      </v-layout>
-      <v-layout row justify-center>
-        <!-- <v-flex sm12 md6>
-              <canvas id="typeChart" />
-            </v-flex> -->
-        <v-flex sm10 xs12>
-          <canvas id="gradeChartRope" :height="ropeShow" />
-        </v-flex>
-      </v-layout>
-      <v-layout row justify-center>
-        <!-- <v-flex sm12 md6>
-              <canvas id="typeChart" />
-            </v-flex> -->
-        <v-flex sm10 xs12>
-          <canvas id="gradeChartBoulder" :height="boulderShow" />
-        </v-flex>
-      </v-layout>
-      <!-- {{ panel }} -->
-      <!-- wall card -->
-      <div v-for="(wall, i) in crag.walls" :key="i">
-        <v-toolbar color="primary" dark>
-          <v-toolbar-title
-            >{{ wall.name }} - {{ wall.routes.length }} Routes</v-toolbar-title
+        <!-- <v-card-title>
+          <nuxt-link
+            style="text-decoration:none;"
+            :to="'/areas/' + crag.crag.area.areaId"
           >
-        </v-toolbar>
-        <v-expansion-panels readonly v-model="panel[i]" accordion>
-          <v-expansion-panel v-for="(route, ri) in wall.routes" :key="ri">
-            <!-- @click="checkRoute(i, ri), (routeFromPage = true)" -->
-            <v-expansion-panel-header
-              :id="wall.routes[ri].routeId"
-              @click="checkRoute(i, ri), (routeFromPage = true)"
+            <v-icon color="primary">
+              fa-arrow-left
+            </v-icon>
+            {{ crag.crag.area.name }}
+          </nuxt-link>
+        </v-card-title> -->
+        <v-container>
+          <v-img
+            :alt="crag.name + 'photo'"
+            :src="crag.crag.imageLocation"
+            aspect-ratio="2"
+            contain
+            lazy
+          >
+            <v-layout
+              slot="placeholder"
+              fill-height
+              align-center
+              justify-center
+              ma-0
             >
-              {{ route.name }} 5.{{ route.grade
-              }}{{ route.gradeModifier }} &nbsp;
-              <span :class="getClass(route.style)">{{ route.style }}</span>
-              <span v-if="route.pitches.length > 1">
-                &nbsp;({{ route.pitches.length }})</span
+              <v-progress-circular
+                indeterminate
+                color="grey lighten-5"
+              ></v-progress-circular>
+            </v-layout>
+          </v-img>
+        </v-container>
+        <v-container>
+          <!-- <v-layout v-if="apiData">
+            {{ apiData }}
+            {{ apiWalls }}
+            {{ apiRoutes }}
+          </v-layout> -->
+          <v-layout wrap fill-height align-start>
+            <v-flex xs12 sm2 offset-sm1>
+              <v-card-text>
+                <h3 class="text-sm-right text-xs-center">Description:</h3>
+              </v-card-text>
+            </v-flex>
+            <v-flex xs12 sm8>
+              <v-card-text
+                class="text-sm-left text-xs-center"
+                style="white-space: pre-line;"
+                >{{ crag.crag.description }}</v-card-text
               >
-            </v-expansion-panel-header>
-            <v-expansion-panel-content xs12 sm10 offset-sm1 mb-5>
-              <v-card>
-                <v-container>
-                  <v-layout row>
-                    <v-img
-                      :src="route.mainImageLocation"
-                      aspect-ratio=""
-                      contain
+            </v-flex>
+          </v-layout>
+          <v-layout wrap fill-height align-center>
+            <v-flex xs12 sm2 offset-sm1>
+              <v-card-text>
+                <h3 class="text-xs-center text-sm-right">Routes:</h3>
+              </v-card-text>
+            </v-flex>
+            <v-flex xs4 sm2 offset-sm1>
+              <v-card-text v-if="crag.trad" class="text-xs-left">
+                {{ crag.trad }} <span class="trad-style">Trad</span>
+              </v-card-text>
+            </v-flex>
+            <v-flex xs4 sm2 fill-height align-self-center>
+              <v-card-text class="text-xs-left" v-if="crag.sport">
+                {{ crag.sport }} <span class="sport-style">Sport</span>
+              </v-card-text>
+            </v-flex>
+            <v-flex xs4 sm2>
+              <v-card-text v-if="crag.boulder" class="text-xs-left">
+                {{ crag.boulder }} <span class="boulder-style">Boulder</span>
+              </v-card-text>
+            </v-flex>
+          </v-layout>
+          <!-- <v-layout row>
+            <v-flex xs4 sm2 offset-sm1>
+              <v-card-text>
+                <h3 class="text-xs-right">Grades:</h3>
+              </v-card-text>
+            </v-flex>
+            <v-flex offset-sm1>
+              <v-card-text>
+                <p class="text-xs-left">
+                  <span v-for="(grade, i) in gradeTotals.total"
+                    ><span class="grade-numbers" v-if="grade"
+                      >5.{{ i }}: {{ grade }}
+                    </span></span
+                  >
+                </p>
+              </v-card-text>
+            </v-flex>
+          </v-layout> -->
+          <v-layout row justify-center>
+            <!-- <v-flex sm12 md6>
+              <canvas id="typeChart" />
+            </v-flex> -->
+            <v-flex sm10 xs12>
+              <canvas id="gradeChartRope" :height="ropeShow" />
+            </v-flex>
+          </v-layout>
+          <v-layout row justify-center>
+            <!-- <v-flex sm12 md6>
+              <canvas id="typeChart" />
+            </v-flex> -->
+            <v-flex sm10 xs12>
+              <canvas id="gradeChartBoulder" :height="boulderShow" />
+            </v-flex>
+          </v-layout>
+          <!-- {{ panel }} -->
+          <!-- wall card -->
+          <v-flex v-for="(wall, i) in crag.walls" :key="i">
+            <v-toolbar color="primary" dark>
+              <v-toolbar-title
+                >{{ wall.name }} -
+                {{ wall.routes.length }} Routes</v-toolbar-title
+              >
+            </v-toolbar>
+            <v-expansion-panels readonly accordion v-model="panel[i]">
+              <v-expansion-panel v-for="(route, ri) in wall.routes" :key="ri">
+                <!-- @click="checkRoute(i, ri), (routeFromPage = true)" -->
+                <v-expansion-panel-header
+                  :id="wall.routes[ri].routeId"
+                  @click="checkRoute(i, ri), (routeFromPage = true)"
+                >
+                  <v-flex class="text-left" justify-center>
+                    {{ route.name
+                    }}<span v-if="route.style === 'boulder'"> V</span
+                    ><span
+                      v-if="route.style === 'sport' || route.style === 'trad'"
                     >
-                      <v-layout
-                        slot="placeholder"
-                        fill-height
-                        align-center
-                        justify-center
-                        ma-0
-                      >
-                        <v-progress-circular
-                          indeterminate
-                          color="grey lighten-5"
-                        ></v-progress-circular>
+                      5.</span
+                    >{{ route.grade }}{{ route.gradeModifier }} &nbsp;
+                    <span :class="getClass(route.style)">{{
+                      route.style
+                    }}</span>
+                    <span v-if="route.pitches.length > 1">
+                      &nbsp;({{ route.pitches.length }})</span
+                    >
+                  </v-flex>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content xs12 sm10 offset-sm1 mb-5>
+                  <v-card>
+                    <v-container>
+                      <v-layout row>
+                        <v-img
+                          :alt="route.name + ' route photo'"
+                          :src="route.mainImageLocation"
+                          contain
+                          max-height="400"
+                        >
+                          <v-layout
+                            slot="placeholder"
+                            fill-height
+                            align-center
+                            justify-center
+                            ma-0
+                          >
+                            <v-progress-circular
+                              indeterminate
+                              color="grey lighten-5"
+                            ></v-progress-circular>
+                          </v-layout>
+                        </v-img>
                       </v-layout>
-                    </v-img>
-                  </v-layout>
-                  <v-layout wrap>
-                    <v-flex xs12 sm3>
-                      <v-card-text>
-                        <h3 class="text-xs-center text-sm-right">
-                          Protection
-                        </h3>
-                      </v-card-text>
-                    </v-flex>
-                    <v-flex xs12 sm9>
-                      <v-card-text>
-                        <p class="text-xs-center text-sm-left">
-                          {{ route.protection }}
-                        </p>
-                      </v-card-text>
-                    </v-flex>
-                  </v-layout>
-                  <v-layout wrap v-if="route.pitches.length > 1">
-                    <v-flex xs12 sm3>
-                      <v-card-text>
-                        <h3 class="text-xs-center text-sm-right">
-                          Description
-                        </h3>
-                      </v-card-text>
-                    </v-flex>
-                    <v-flex xs12 sm9>
-                      <v-card-text>
-                        <p class="text-xs-center text-sm-left">
-                          {{ route.description }}
-                        </p>
-                      </v-card-text>
-                    </v-flex>
-                  </v-layout>
-                  <v-layout v-for="(pitch, pi) in route.pitches" :key="pi" wrap>
-                    <v-layout wrap>
-                      <v-flex v-if="route.pitches.length === 1" xs12 sm3>
-                        <v-card-text>
-                          <h3 class="text-xs-center text-sm-right">
-                            Description
-                          </h3>
-                        </v-card-text>
-                      </v-flex>
-                      <v-flex v-if="route.pitches.length > 1" xs12 sm3>
-                        <v-card-text>
-                          <h3 class="text-xs-center text-sm-right">
-                            Pitch {{ pi + 1 }}:
-                          </h3>
-                        </v-card-text>
-                      </v-flex>
+                      <v-layout wrap v-if="route.distance">
+                        <v-flex xs12 sm3>
+                          <v-card-text>
+                            <h3 class="text-xs-center text-sm-right">
+                              Length
+                            </h3>
+                          </v-card-text>
+                        </v-flex>
+                        <v-flex xs12 sm9>
+                          <v-card-text>
+                            <p class="text-xs-center text-sm-left">
+                              {{ route.distance }}m
+                            </p>
+                          </v-card-text>
+                        </v-flex>
+                      </v-layout>
+                      <v-layout wrap v-if="route.protection">
+                        <v-flex xs12 sm3>
+                          <v-card-text>
+                            <h3 class="text-xs-center text-sm-right">
+                              Protection
+                            </h3>
+                          </v-card-text>
+                        </v-flex>
+                        <v-flex xs12 sm9>
+                          <v-card-text>
+                            <p class="text-xs-center text-sm-left">
+                              {{ route.protection }}
+                            </p>
+                          </v-card-text>
+                        </v-flex>
+                      </v-layout>
+                      <v-layout wrap v-if="route.description">
+                        <v-flex xs12 sm3>
+                          <v-card-text>
+                            <h3 class="text-xs-center text-sm-right">
+                              Description
+                            </h3>
+                          </v-card-text>
+                        </v-flex>
+                        <v-flex xs12 sm9>
+                          <v-card-text>
+                            <p
+                              class="text-xs-center text-sm-left"
+                              style="white-space: pre-line;"
+                            >
+                              {{ route.description }}
+                            </p>
+                          </v-card-text>
+                        </v-flex>
+                      </v-layout>
+                      <v-layout
+                        v-for="(pitch, pi) in route.pitches"
+                        :key="pi"
+                        wrap
+                      >
+                        <v-layout wrap>
+                          <v-flex v-if="route.pitches.length === 1" xs12 sm3>
+                            <v-card-text>
+                              <h3 class="text-xs-center text-sm-right">
+                                Description
+                              </h3>
+                            </v-card-text>
+                          </v-flex>
+                          <v-flex v-if="route.pitches.length > 1" xs12 sm3>
+                            <v-card-text>
+                              <h3 class="text-xs-center text-sm-right">
+                                Pitch {{ pi + 1 }}
+                                <span v-if="pitch.distance"
+                                  >({{ pitch.distance }}m)</span
+                                >:
+                              </h3>
+                            </v-card-text>
+                          </v-flex>
 
-                      <v-flex xs12 sm9>
-                        <v-card-text>
-                          <p class="text-xs-center text-sm-left">
-                            {{ pitch.description }}
-                          </p>
-                        </v-card-text>
-                      </v-flex>
-                    </v-layout>
-                  </v-layout>
+                          <v-flex xs12 sm9>
+                            <v-card-text>
+                              <p
+                                class="text-xs-center text-sm-left"
+                                style="white-space: pre-line;"
+                              >
+                                {{ pitch.description }}
+                              </p>
+                            </v-card-text>
+                          </v-flex>
+                        </v-layout>
+                      </v-layout>
 
-                  <v-layout row>
-                    <v-expansion-panel v-if="route.photos">
-                      <v-expansion-panel-content>
-                        <div slot="header">Photos</div>
-                        <v-carousel :cycle="false">
-                          <v-carousel-item
-                            v-for="(photo, phi) in route.photos"
-                            :key="phi"
-                            :src="photo.src"
-                            contain
-                            lazy
-                          ></v-carousel-item>
-                        </v-carousel>
-                        <!-- <v-container grid-list-sm fluid>
+                      <v-layout row>
+                        <v-expansion-panel v-if="route.photos">
+                          <v-expansion-panel-content>
+                            <div slot="header">Photos</div>
+                            <v-carousel :cycle="false">
+                              <v-carousel-item
+                                v-for="(photo, phi) in route.photos"
+                                :key="phi"
+                                :src="photo.src"
+                                contain
+                                lazy
+                              ></v-carousel-item>
+                            </v-carousel>
+                            <!-- <v-container grid-list-sm fluid>
                             <v-layout row wrap>
                               <v-flex
                                 v-for="(photo, phi) in route.photos"
@@ -221,40 +302,42 @@
                               </v-flex>
                             </v-layout>
                           </v-container> -->
-                      </v-expansion-panel-content>
-                      <v-expansion-panel-content
-                        v-for="(comment, ci) in route.comments"
-                        :key="ci"
-                      >
-                        <div slot="header">Comments</div>
-                        <v-card>
-                          <v-layout wrap>
-                            <v-flex xs12 sm3>
-                              <v-card-text
-                                ><h3 class="text-xs-center text-sm-right">
-                                  {{ comment.user }}
-                                </h3></v-card-text
-                              >
-                            </v-flex>
-                            <v-flex xs12 sm9>
-                              <v-card-text>
-                                <p class="text-xs-center text-sm-left">
-                                  {{ comment.comment }}
-                                </p></v-card-text
-                              >
-                            </v-flex>
-                          </v-layout>
-                        </v-card>
-                      </v-expansion-panel-content>
-                    </v-expansion-panel>
-                  </v-layout>
-                </v-container>
-              </v-card>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </div>
-    </v-container>
+                          </v-expansion-panel-content>
+                          <v-expansion-panel-content
+                            v-for="(comment, ci) in route.comments"
+                            :key="ci"
+                          >
+                            <div slot="header">Comments</div>
+                            <v-card>
+                              <v-layout wrap>
+                                <v-flex xs12 sm3>
+                                  <v-card-text
+                                    ><h3 class="text-xs-center text-sm-right">
+                                      {{ comment.user }}
+                                    </h3></v-card-text
+                                  >
+                                </v-flex>
+                                <v-flex xs12 sm9>
+                                  <v-card-text>
+                                    <p class="text-xs-center text-sm-left">
+                                      {{ comment.comment }}
+                                    </p></v-card-text
+                                  >
+                                </v-flex>
+                              </v-layout>
+                            </v-card>
+                          </v-expansion-panel-content>
+                        </v-expansion-panel>
+                      </v-layout>
+                    </v-container>
+                  </v-card>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </v-flex>
+        </v-container>
+      </v-card>
+    </v-flex>
   </v-container>
 </template>
 

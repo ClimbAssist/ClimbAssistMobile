@@ -1,11 +1,11 @@
 const state = {
   filter: {
-    filterText: "",
+    filterText: '',
     uiaa_grade: [0, 16],
     yds_grade: [1, 16],
     boulder: true,
     sport: true,
-    trad: true
+    trad: true,
   },
   dataSet: false,
   mapBounds: undefined,
@@ -18,7 +18,7 @@ const state = {
     description: null,
     location: null,
     model: null,
-    walls: []
+    walls: [],
   },
   areaState: {
     name: null,
@@ -26,20 +26,20 @@ const state = {
     regionId: null,
     description: null,
     location: null,
-    subAreas: []
+    subAreas: [],
   },
   loadedCrags: [],
-  loadError: undefined
+  loadError: undefined,
 };
 
 const getters = {
-  filteredRoutes: state => {
+  filteredRoutes: (state) => {
     const filteredRoutes = {
       crags: [],
       subAreas: [],
       areas: [],
       regions: [],
-      countries: []
+      countries: [],
     };
     for (let tkey in state.countries) {
       const countryTotals = {
@@ -47,7 +47,7 @@ const getters = {
         trad: 0,
         sport: 0,
         boulder: 0,
-        filteredRegions: []
+        filteredRegions: [],
       };
       for (let skey in state.countries[tkey].regions) {
         const regionTotals = {
@@ -55,7 +55,7 @@ const getters = {
           trad: 0,
           sport: 0,
           boulder: 0,
-          filteredAreas: []
+          filteredAreas: [],
         };
         for (let akey in state.countries[tkey].regions[skey].areas) {
           const areaTotals = {
@@ -69,7 +69,7 @@ const getters = {
             trad: 0,
             sport: 0,
             boulder: 0,
-            filteredSubAreas: []
+            filteredSubAreas: [],
           };
           for (let subkey in state.countries[tkey].regions[skey].areas[akey]
             .subAreas) {
@@ -84,7 +84,7 @@ const getters = {
               trad: 0,
               sport: 0,
               boulder: 0,
-              filteredCrags: []
+              filteredCrags: [],
             };
             for (let ckey in state.countries[tkey].regions[skey].areas[akey]
               .subAreas[subkey].crags) {
@@ -110,7 +110,7 @@ const getters = {
                 trad: 0,
                 sport: 0,
                 boulder: 0,
-                walls: []
+                walls: [],
               };
               for (let wkey in state.countries[tkey].regions[skey].areas[akey]
                 .subAreas[subkey].crags[ckey].walls) {
@@ -119,14 +119,14 @@ const getters = {
                     state.countries[tkey].regions[skey].areas[akey].subAreas[
                       subkey
                     ].crags[ckey].walls[wkey].name,
-                  routes: []
+                  routes: [],
                 };
                 for (let rkey in state.countries[tkey].regions[skey].areas[akey]
                   .subAreas[subkey].crags[ckey].walls[wkey].routes) {
                   if (
                     state.countries[tkey].regions[skey].areas[akey].subAreas[
                       subkey
-                    ].crags[ckey].walls[wkey].routes[rkey].style === "trad" &&
+                    ].crags[ckey].walls[wkey].routes[rkey].style === 'trad' &&
                     state.filter.trad &&
                     state.countries[tkey].regions[skey].areas[akey].subAreas[
                       subkey
@@ -147,7 +147,7 @@ const getters = {
                   if (
                     state.countries[tkey].regions[skey].areas[akey].subAreas[
                       subkey
-                    ].crags[ckey].walls[wkey].routes[rkey].style === "sport" &&
+                    ].crags[ckey].walls[wkey].routes[rkey].style === 'sport' &&
                     state.filter.sport &&
                     state.countries[tkey].regions[skey].areas[akey].subAreas[
                       subkey
@@ -169,7 +169,7 @@ const getters = {
                     state.countries[tkey].regions[skey].areas[akey].subAreas[
                       subkey
                     ].crags[ckey].walls[wkey].routes[rkey].style ===
-                      "boulder" &&
+                      'boulder' &&
                     state.filter.boulder &&
                     state.countries[tkey].regions[skey].areas[akey].subAreas[
                       subkey
@@ -192,7 +192,7 @@ const getters = {
               }
 
               if (
-                (state.filterText === "" ||
+                (state.filterText === '' ||
                   cragTotals.name
                     .toUpperCase()
                     .includes(state.filter.filterText.toUpperCase()) ||
@@ -226,12 +226,10 @@ const getters = {
                       ].crags[ckey].location.longitude >
                         state.mapBounds._sw.lng) ||
                       (state.mapBounds._ne.lng <
-                        state.countries[tkey].regions[skey].areas[akey].subAreas[
-                          subkey
-                        ].crags[ckey].location.longitude &&
-                        state.countries[tkey].regions[skey].areas[akey].subAreas[
-                          subkey
-                        ].crags[ckey].location.longitude <
+                        state.countries[tkey].regions[skey].areas[akey]
+                          .subAreas[subkey].crags[ckey].location.longitude &&
+                        state.countries[tkey].regions[skey].areas[akey]
+                          .subAreas[subkey].crags[ckey].location.longitude <
                           state.mapBounds._sw.lng))))
               ) {
                 subAreaTotals.boulder += cragTotals.boulder;
@@ -252,7 +250,6 @@ const getters = {
               areaTotals.filteredSubAreas.push(subAreaTotals);
               filteredRoutes.subAreas.push(subAreaTotals);
             }
-
           }
           if (areaTotals.trad || areaTotals.sport || areaTotals.boulder) {
             regionTotals.boulder += areaTotals.boulder;
@@ -274,14 +271,14 @@ const getters = {
     }
     return filteredRoutes;
   },
-  crag: state => {
+  crag: (state) => {
     let cragTotals = {
       name: state.cragState.name,
       crag: state.cragState,
       trad: 0,
       sport: 0,
       boulder: 0,
-      walls: []
+      walls: [],
     };
     for (let wkey in state.cragState.walls) {
       let filteredWall = {
@@ -289,11 +286,11 @@ const getters = {
         trad: 0,
         sport: 0,
         boulder: 0,
-        routes: []
+        routes: [],
       };
       for (let rkey in state.cragState.walls[wkey].routes) {
         if (
-          state.filterText === "" ||
+          state.filterText === '' ||
           state.cragState.walls[wkey].routes[rkey].name
             .toUpperCase()
             .includes(state.filter.filterText.toUpperCase()) ||
@@ -302,7 +299,7 @@ const getters = {
             .includes(state.filter.filterText.toUpperCase())
         ) {
           if (
-            state.cragState.walls[wkey].routes[rkey].style === "trad" &&
+            state.cragState.walls[wkey].routes[rkey].style === 'trad' &&
             state.filter.trad &&
             state.cragState.walls[wkey].routes[rkey].grade >=
               state.filter.yds_grade[0] &&
@@ -316,7 +313,7 @@ const getters = {
             cragTotals.trad++;
           }
           if (
-            state.cragState.walls[wkey].routes[rkey].style === "sport" &&
+            state.cragState.walls[wkey].routes[rkey].style === 'sport' &&
             state.filter.sport &&
             state.cragState.walls[wkey].routes[rkey].grade >=
               state.filter.yds_grade[0] &&
@@ -330,7 +327,7 @@ const getters = {
             cragTotals.sport++;
           }
           if (
-            state.cragState.walls[wkey].routes[rkey].style === "boulder" &&
+            state.cragState.walls[wkey].routes[rkey].style === 'boulder' &&
             state.filter.boulder &&
             state.cragState.walls[wkey].routes[rkey].grade >=
               state.filter.uiaa_grade[0] &&
@@ -349,7 +346,7 @@ const getters = {
     }
     return cragTotals;
   },
-  area: state => {
+  area: (state) => {
     const areaTotals = {
       name: state.areaState.name,
       slug: state.areaState.areaId,
@@ -357,7 +354,7 @@ const getters = {
       trad: 0,
       sport: 0,
       boulder: 0,
-      filteredSubAreas: []
+      filteredSubAreas: [],
     };
     for (let subkey in state.areaState.subAreas) {
       const subAreaTotals = {
@@ -367,7 +364,7 @@ const getters = {
         trad: 0,
         sport: 0,
         boulder: 0,
-        filteredCrags: []
+        filteredCrags: [],
       };
       for (let ckey in state.areaState.subAreas[subkey].crags) {
         const cragTotals = {
@@ -381,12 +378,12 @@ const getters = {
           trad: 0,
           sport: 0,
           boulder: 0,
-          walls: []
+          walls: [],
         };
         for (let wkey in state.areaState.subAreas[subkey].crags[ckey].walls) {
           const filteredWall = {
             name: state.areaState.subAreas[subkey].crags[ckey].walls[wkey].name,
-            routes: []
+            routes: [],
           };
           for (let rkey in state.areaState.subAreas[subkey].crags[ckey].walls[
             wkey
@@ -394,7 +391,7 @@ const getters = {
             if (
               state.areaState.subAreas[subkey].crags[ckey].walls[wkey].routes[
                 rkey
-              ].style === "trad" &&
+              ].style === 'trad' &&
               state.filter.trad &&
               state.areaState.subAreas[subkey].crags[ckey].walls[wkey].routes[
                 rkey
@@ -413,7 +410,7 @@ const getters = {
             if (
               state.areaState.subAreas[subkey].crags[ckey].walls[wkey].routes[
                 rkey
-              ].style === "sport" &&
+              ].style === 'sport' &&
               state.filter.sport &&
               state.areaState.subAreas[subkey].crags[ckey].walls[wkey].routes[
                 rkey
@@ -432,7 +429,7 @@ const getters = {
             if (
               state.areaState.subAreas[subkey].crags[ckey].walls[wkey].routes[
                 rkey
-              ].style === "boulder" &&
+              ].style === 'boulder' &&
               state.filter.boulder &&
               state.areaState.subAreas[subkey].crags[ckey].walls[wkey].routes[
                 rkey
@@ -453,7 +450,7 @@ const getters = {
         }
 
         if (
-          (state.filterText === "" ||
+          (state.filterText === '' ||
             cragTotals.name
               .toUpperCase()
               .includes(state.filter.filterText.toUpperCase()) ||
@@ -475,7 +472,7 @@ const getters = {
       areaTotals.filteredSubAreas.push(subAreaTotals);
     }
     return areaTotals;
-  }
+  },
 };
 const mutations = {
   updateFilter: (state, payload) => {
@@ -495,14 +492,14 @@ const mutations = {
     state.filter.filterText = payload;
   },
   updateCrag: (state, payload) => {
-      state.cragState.name= payload.name;
-      state.cragState.cragId= payload.cragId;
-      state.cragState.subAreaId= payload.subAreaId;
-      state.cragState.imageLocation= payload.imageLocation;
-      state.cragState.description= payload.description;
-      state.cragState.location= payload.location;
-      state.cragState.model= payload.model;
-      state.cragState.walls= payload.walls;
+    state.cragState.name = payload.name;
+    state.cragState.cragId = payload.cragId;
+    state.cragState.subAreaId = payload.subAreaId;
+    state.cragState.imageLocation = payload.imageLocation;
+    state.cragState.description = payload.description;
+    state.cragState.location = payload.location;
+    state.cragState.model = payload.model;
+    state.cragState.walls = payload.walls;
     // state.cragState = payload;
   },
   updateCragPoints: (state, wi, ri, payload) => {
@@ -510,7 +507,7 @@ const mutations = {
   },
   updateArea: (state, payload) => {
     state.areaState.name = payload.name;
-    state.areaState.areaId= payload.areaId;
+    state.areaState.areaId = payload.areaId;
     state.areaState.regionId = payload.regionId;
     state.areaState.description = payload.description;
     state.areaState.location = payload.location;
@@ -526,7 +523,7 @@ const mutations = {
   },
   updateLoadError: (state, payload) => {
     state.loadError = payload;
-  }
+  },
 };
 
 const actions = {};
@@ -534,5 +531,5 @@ export default {
   state,
   getters,
   mutations,
-  actions
+  actions,
 };
