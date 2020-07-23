@@ -38,9 +38,9 @@ export const fetch = {
         },
         (response) => {
           //fail
-          this.$store.commit('filter/dataSet', true);
+          this.$store.commit('dataSet', true);
           this.$store.commit(
-            'filter/updateLoadError',
+            'updateLoadError',
             'There was a problem loading the data, please try again later.'
           );
           console.log(response);

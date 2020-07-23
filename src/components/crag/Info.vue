@@ -657,50 +657,54 @@ export default {
         fs.root.getDirectory(
           'crags',
           { create: true },
-          (dirEntry) => {
-            console.log(dirEntry);
-          },
-          (error) => {
-            console.log(error);
-          }
-        );
-        fs.root.getDirectory(
-          'crags/' + this.$route.params.frame,
-          { create: true },
-          (dirEntry) => {
-            console.log(dirEntry);
-          },
-          (error) => {
-            console.log(error);
-          }
-        );
-        fs.root.getFile(
-          'crags/' +
-            this.$route.params.frame +
-            '/' +
-            this.$route.params.frame +
-            '.json',
-          { create: true, exclusive: false },
-          (fileEntry) => {
-            console.log('fileEntry is file?' + fileEntry.isFile.toString());
-            console.log(fileEntry);
-            this.writeJsonFile(fileEntry);
-          },
-          (error) => {
-            console.log(error);
-          }
-        );
-        fs.root.getFile(
-          'crags/' +
-            this.$route.params.frame +
-            '/' +
-            this.$route.params.frame +
-            '.glb',
-          { create: true, exclusive: false },
-          (fileEntry) => {
-            console.log('fileEntry is file?' + fileEntry.isFile.toString());
-            console.log(fileEntry);
-            this.downloadFile(fileEntry);
+          (cragEntry) => {
+            console.log(cragEntry);
+            fs.root.getDirectory(
+              'crags/' + this.$route.params.frame,
+              { create: true },
+              (dirEntry) => {
+                fs.root.getFile(
+                  'crags/' +
+                    this.$route.params.frame +
+                    '/' +
+                    this.$route.params.frame +
+                    '.json',
+                  { create: true, exclusive: false },
+                  (fileEntry) => {
+                    console.log(
+                      'fileEntry is file?' + fileEntry.isFile.toString()
+                    );
+                    console.log(fileEntry);
+                    this.writeJsonFile(fileEntry);
+                  },
+                  (error) => {
+                    console.log(error);
+                  }
+                );
+                fs.root.getFile(
+                  'crags/' +
+                    this.$route.params.frame +
+                    '/' +
+                    this.$route.params.frame +
+                    '.glb',
+                  { create: true, exclusive: false },
+                  (fileEntry) => {
+                    console.log(
+                      'fileEntry is file?' + fileEntry.isFile.toString()
+                    );
+                    console.log(fileEntry);
+                    this.downloadFile(fileEntry);
+                  },
+                  (error) => {
+                    console.log(error);
+                  }
+                );
+                console.log(dirEntry);
+              },
+              (error) => {
+                console.log(error);
+              }
+            );
           },
           (error) => {
             console.log(error);

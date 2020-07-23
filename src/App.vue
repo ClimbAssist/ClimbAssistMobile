@@ -1,6 +1,6 @@
 <template>
   <v-app id="app">
-    <v-navigation-drawer v-model="drawer" fixed app clipped>
+    <v-navigation-drawer v-model="drawer" fixed app clipped touchless>
       <v-list>
         <v-list-item v-if="username" to="/user" router>
           <v-list-item-action>
@@ -31,7 +31,7 @@
       <div>
         <v-text-field
           @input="setTimer()"
-          flat
+          text
           solo-inverted
           hide-details
           prepend-inner-icon="fa-search"
@@ -243,6 +243,7 @@ import { sampleData } from './mixins/sampleData.js';
 import { fetch } from './mixins/fetchData.js';
 export default {
   name: 'App',
+  el: '#app',
   data: () => ({
     drawer: null,
     items: [
@@ -263,7 +264,7 @@ export default {
       },
       {
         icon: 'fa-folder',
-        title: 'file',
+        title: 'file test',
         to: '/file-test',
       },
       {
@@ -342,6 +343,9 @@ export default {
     },
   },
   methods: {
+    onOffline() {
+      console.log('device is offline');
+    },
     setAgreement() {
       this.$store.commit(
         'updateMessage',
@@ -430,6 +434,7 @@ export default {
     this.fetchData();
   },
   mounted() {
+    document.addEventListener('offline', this.onOffline, false);
     // this.setAgreement();
     // local testing
     // for (let i in this.countries) {
@@ -442,6 +447,7 @@ export default {
     // );
   },
 };
+// document.addEventListener('deviceready', app.init);
 </script>
 
 <style>
