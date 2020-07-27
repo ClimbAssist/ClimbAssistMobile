@@ -10,14 +10,6 @@
             <v-list-item-title>{{ username }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item v-else to="/user/login" router>
-          <v-list-item-action>
-            <v-icon>fa-user</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>login</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
         <v-list-item v-for="(item, i) in items" :key="i" :to="item.to" router>
           <v-list-item-action>
             <v-icon>{{ item.icon }}</v-icon>
@@ -225,6 +217,37 @@
       <router-view />
     </v-content>
     <bottomNav />
+    <v-dialog fullscreen persistent :value="dialog.open">
+      <v-card>
+        <v-card-title class="headline green lighten-2">
+          {{ dialog.title }}
+        </v-card-title>
+
+        <v-card-text>
+          {{ dialog.text }}
+        </v-card-text>
+
+        <v-divider></v-divider>
+        <div v-if="dialog.component">
+          <transition name="tab" mode="out-in">
+            <component :is="dialog.component" />
+          </transition>
+          <v-divider></v-divider>
+          <v-flex md6 lg4 pb-4>
+            <v-btn
+              block
+              text
+              dark
+              small
+              color="primary"
+              @click="switchComponent()"
+            >
+              {{ dialog.switchText }}
+            </v-btn>
+          </v-flex>
+        </div>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 <script>
@@ -238,9 +261,12 @@ import EditorRouteView from './components/sidebar/EditorRouteView.vue';
 import Navbar from './components/Navbar.vue';
 import BottomNavbar from './components/BottomNavbar.vue';
 import Snackbar from './components/Snackbar.vue';
+import Login from './components/dialog/Login.vue';
+import Create from './components/dialog/Create.vue';
 import { mapGetters } from 'vuex';
 import { sampleData } from './mixins/sampleData.js';
-import { fetch } from './mixins/fetchData.js';
+import { fetchData } from './mixins/fetchData.js';
+import { fetchUser } from './mixins/fetchUser.js';
 export default {
   name: 'App',
   el: '#app',
@@ -275,6 +301,7 @@ export default {
     ],
     showSheet: false,
     frameTabs: 'info',
+    dialogComponent: 'login',
     filterTextSet: '',
     filterTemp: {
       uiaa_grade: [0, 16],
@@ -284,13 +311,16 @@ export default {
       trad: true,
     },
   }),
-  mixins: [sampleData, fetch],
+  mixins: [sampleData, fetchData, fetchUser],
   computed: {
     isAdministrator() {
       return this.$store.state.user.isAdministrator;
     },
     username() {
       return this.$store.state.user.username;
+    },
+    fromServer() {
+      return this.$store.state.user.fromServer;
     },
     filterText() {
       return this.$store.state.filter.filter.filterText;
@@ -300,13 +330,6 @@ export default {
     },
     sidebar() {
       return this.$store.state.sidebar.sidebar;
-    },
-    editor() {
-      if (this.$route.path.match(/editor/)) {
-        return true;
-      } else {
-        return false;
-      }
     },
     ...mapGetters({
       filteredRoutes: 'filteredRoutes',
@@ -341,10 +364,16 @@ export default {
         return true;
       }
     },
+    dialog() {
+      return this.$store.state.dialog;
+    },
   },
   methods: {
-    onOffline() {
-      console.log('device is offline');
+    onOnline() {
+      console.log('device is online');
+      if (!this.fromServer) {
+        this.getUser();
+      }
     },
     setAgreement() {
       this.$store.commit(
@@ -395,26 +424,14 @@ export default {
 
       return str;
     },
-    async getUser() {
-      const userData = await cordova.plugin.http.get(
-        'https://www.climbassist.com/v1/user',
-        {},
-        {},
-        (response) => {
-          //success
-          let user = JSON.parse(response.data).data;
-          this.$store.commit('updateUsername', user.username);
-          this.$store.commit('updateEmail', user.email);
-          this.$store.commit(
-            'updateIsAdministrator',
-            userData.data.isAdministrator
-          );
-        },
-        (response) => {
-          //fail user not loggged in
-          console.log(response);
-        }
-      );
+    switchComponent() {
+      if (this.dialog.component === 'login') {
+        this.$store.commit('updateDialogComponent', 'create');
+        this.$store.commit('updateDialogSwitchText', 'Login');
+      } else {
+        this.$store.commit('updateDialogComponent', 'login');
+        this.$store.commit('updateDialogSwitchText', 'Create Account');
+      }
     },
   },
   components: {
@@ -428,23 +445,16 @@ export default {
     navbar: Navbar,
     bottomNav: BottomNavbar,
     snackbar: Snackbar,
+    login: Login,
+    create: Create,
   },
   created() {
-    // this.getUser();
-    this.fetchData();
+    this.getUser();
+    cordova.plugin.http.setDataSerializer('json');
   },
   mounted() {
-    document.addEventListener('offline', this.onOffline, false);
+    document.addEventListener('online', this.onOnline, false);
     // this.setAgreement();
-    // local testing
-    // for (let i in this.countries) {
-    //   this.$store.commit("updateRoutes", this.countries[i]);
-    // }
-    // this.$store.commit("dataSet", true);
-    // this.$store.commit(
-    //   "updateLoadedCrags",
-    //   this.countries[0].regions[0].areas[0].subAreas[0].crags[1]
-    // );
   },
 };
 // document.addEventListener('deviceready', app.init);

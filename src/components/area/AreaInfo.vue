@@ -1,129 +1,127 @@
 <template>
   <v-container>
-      <v-layout row wrap>
-        <v-flex xs12 sm2 offset-sm1>
-          <v-card-text>
-            <h3 class="text-xs-right">Description:</h3>
-          </v-card-text>
-        </v-flex>
-        <v-flex xs12 s8>
-          <v-card-text>
-            <p class="text-xs-left">
-              {{ area.area.description }}
-            </p>
-          </v-card-text>
-        </v-flex>
-      </v-layout>
-      <v-layout row wrap>
-        <v-flex xs12 sm2 offset-sm1>
-          <v-card-text>
-            <h3 class="text-xs-right">Routes:</h3>
-          </v-card-text>
-        </v-flex>
-        <v-flex xs4 offset-sm1>
-          <v-card-text v-if="area.trad">
-            <p class="text-xs-left">
-              {{ area.trad }} <span class="trad-style">Trad</span>
-            </p>
-          </v-card-text>
-        </v-flex>
-        <v-flex xs4>
-          <v-card-text v-if="area.sport">
-            <p class="text-xs-left">
-              {{ area.sport }} <span class="sport-style">Sport</span>
-            </p>
-          </v-card-text>
-        </v-flex>
-        <v-flex xs4>
-          <v-card-text v-if="area.boulder">
-            <p class="text-xs-left">
-              {{ area.boulder }} <span class="boulder-style">Boulder</span>
-            </p>
-          </v-card-text>
-        </v-flex>
-      </v-layout>
-      <v-layout row justify-center>
-        <v-flex sm10 xs12>
-          <canvas id="gradeChartRope" height="50" />
-        </v-flex>
-      </v-layout>
-      <v-layout row justify-center>
-        <v-flex sm10 xs12>
-          <canvas id="gradeChartBoulder" height="0" />
-        </v-flex>
-      </v-layout>
-      <v-container>
-        <v-card>
-          <v-toolbar dark color="primary">
-            <v-toolbar-title>{{ area.name }}</v-toolbar-title>
-          </v-toolbar>
-          <v-expansion-panels v-if="area.filteredSubAreas.length > 1">
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                {{ subArea.name }} - {{ subArea.trad }} trad
-                {{ subArea.sport }} sport {{ subArea.boulder }} boulder
-              </v-expansion-panel-header>
-              <v-expansion-panel-content
-                v-for="(subArea, subi) in area.filteredSubAreas"
-                :key="subi"
-              >
-                <v-layout
-                  pa-4
-                  row
-                  v-for="(crag, ci) in subArea.filteredCrags"
-                  :key="ci"
-                >
-                  <router-link
-                    :to="{
-                      name: 'frame',
-                      params: {
-                        subAreaKey: subArea.subAreaKey,
-                        cragKey: crag.cragKey,
-                        area: area.slug,
-                        frame: crag.slug
-                      }
-                    }"
-                    >{{ crag.name }} - {{ crag.trad }} trad
-                    {{ crag.sport }} sport {{ crag.boulder }} boulder</router-link
-                  >
-                </v-layout>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-expansion-panels>
-          <v-layout v-else>
-            <v-layout
-              row
-              pa-4
-              v-for="(crag, i) in area.filteredSubAreas[0].filteredCrags"
-              :key="i"
+    <v-layout row wrap>
+      <v-flex xs12 sm2 offset-sm1>
+        <v-card-text>
+          <h3 class="text-xs-right">Description:</h3>
+        </v-card-text>
+      </v-flex>
+      <v-flex xs12 s8>
+        <v-card-text>
+          <p class="text-xs-left">
+            {{ area.area.description }}
+          </p>
+        </v-card-text>
+      </v-flex>
+    </v-layout>
+    <v-layout row wrap>
+      <v-flex xs12 sm2 offset-sm1>
+        <v-card-text>
+          <h3 class="text-xs-right">Routes:</h3>
+        </v-card-text>
+      </v-flex>
+      <v-flex xs4 offset-sm1>
+        <v-card-text v-if="area.trad">
+          <p class="text-xs-left">
+            {{ area.trad }} <span class="trad-style">Trad</span>
+          </p>
+        </v-card-text>
+      </v-flex>
+      <v-flex xs4>
+        <v-card-text v-if="area.sport">
+          <p class="text-xs-left">
+            {{ area.sport }} <span class="sport-style">Sport</span>
+          </p>
+        </v-card-text>
+      </v-flex>
+      <v-flex xs4>
+        <v-card-text v-if="area.boulder">
+          <p class="text-xs-left">
+            {{ area.boulder }} <span class="boulder-style">Boulder</span>
+          </p>
+        </v-card-text>
+      </v-flex>
+    </v-layout>
+    <v-layout row justify-center>
+      <v-flex sm10 xs12>
+        <canvas id="gradeChartRope" height="50" />
+      </v-flex>
+    </v-layout>
+    <v-layout row justify-center>
+      <v-flex sm10 xs12>
+        <canvas id="gradeChartBoulder" height="0" />
+      </v-flex>
+    </v-layout>
+    <v-container>
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-toolbar-title>{{ area.name }}</v-toolbar-title>
+        </v-toolbar>
+        <v-expansion-panels v-if="area.filteredSubAreas.length > 1">
+          <v-expansion-panel>
+            <v-expansion-panel-header>
+              {{ subArea.name }} - {{ subArea.trad }} trad
+              {{ subArea.sport }} sport {{ subArea.boulder }} boulder
+            </v-expansion-panel-header>
+            <v-expansion-panel-content
+              v-for="(subArea, subi) in area.filteredSubAreas"
+              :key="subi"
             >
-              <router-link
-                :to="{
-                  name: 'frame',
-                  params: {
-                    subAreaKey: 0,
-                    cragKey: crag.cragKey,
-                    area: area.slug,
-                    frame: crag.slug
-                  }
-                }"
-                >{{ crag.name }} - {{ crag.trad }} trad {{ crag.sport }} sport
-                {{ crag.boulder }} boulder</router-link
+              <v-layout
+                pa-4
+                row
+                v-for="(crag, ci) in subArea.filteredCrags"
+                :key="ci"
               >
-            </v-layout>
-          </v-layout>
-        </v-card>
-      </v-container>
+                <router-link
+                  :to="{
+                    name: 'frame',
+                    params: {
+                      subAreaKey: subArea.subAreaKey,
+                      cragKey: crag.cragKey,
+                      area: area.slug,
+                      frame: crag.slug,
+                    },
+                  }"
+                  >{{ crag.name }} - {{ crag.trad }} trad {{ crag.sport }} sport
+                  {{ crag.boulder }} boulder</router-link
+                >
+              </v-layout>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+        <v-layout class="pa-2" wrap v-else>
+          <v-flex
+            xs12
+            v-for="(crag, i) in area.filteredSubAreas[0].filteredCrags"
+            :key="i"
+          >
+            <router-link
+              :to="{
+                name: 'frame',
+                params: {
+                  subAreaKey: 0,
+                  cragKey: crag.cragKey,
+                  area: area.slug,
+                  frame: crag.slug,
+                },
+              }"
+              >{{ crag.name }} - {{ crag.trad }} trad {{ crag.sport }} sport
+              {{ crag.boulder }} boulder</router-link
+            >
+          </v-flex>
+        </v-layout>
+      </v-card>
+    </v-container>
   </v-container>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-import Chart from "chart.js";
+import { mapGetters } from 'vuex';
+import Chart from 'chart.js';
 export default {
   data() {
-    return {
-    };
+    return {};
   },
   watch: {
     gradeTotals: {
@@ -137,7 +135,7 @@ export default {
         });
         let labels = [];
         for (let i in this.gradeTotals.total) {
-          labels.push("5." + i);
+          labels.push('5.' + i);
         }
         this.gradeChartRope.data.datasets[0].data = filteredTrad;
         this.gradeChartRope.data.datasets[1].data = filteredSport;
@@ -146,7 +144,7 @@ export default {
 
         let boulderLabels = [];
         for (let i in this.gradeTotals.boulder) {
-          boulderLabels.push("V" + i);
+          boulderLabels.push('V' + i);
         }
 
         let filteredBoulder = this.gradeTotals.boulder.filter(function(el) {
@@ -158,12 +156,12 @@ export default {
 
         // this.typeChart.data.datasets[0].data = [this.crag.trad, this.crag.sport, this.crag.boulder]
         // this.typeChart.update()
-      }
-    }
+      },
+    },
   },
   computed: {
     ...mapGetters({
-      area: "area"
+      area: 'area',
     }),
     filter() {
       return this.$store.state.filter.filter;
@@ -173,7 +171,7 @@ export default {
         trad: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         sport: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         boulder: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        total: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        total: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       };
       for (let skey in this.area.filteredSubAreas) {
         for (let ckey in this.area.filteredSubAreas[skey].filteredCrags) {
@@ -184,7 +182,7 @@ export default {
             ].walls[wkey].routes) {
               if (
                 this.area.filteredSubAreas[skey].filteredCrags[ckey].walls[wkey]
-                  .routes[rkey].style === "trad"
+                  .routes[rkey].style === 'trad'
               ) {
                 gradeTotals.trad[
                   this.area.filteredSubAreas[skey].filteredCrags[ckey].walls[
@@ -198,7 +196,7 @@ export default {
                 ]++;
               } else if (
                 this.area.filteredSubAreas[skey].filteredCrags[ckey].walls[wkey]
-                  .routes[rkey].style === "sport"
+                  .routes[rkey].style === 'sport'
               ) {
                 gradeTotals.sport[
                   this.area.filteredSubAreas[skey].filteredCrags[ckey].walls[
@@ -252,14 +250,14 @@ export default {
         }
       }
       return 0;
-    }
+    },
   },
   methods: {
     setCharts() {
-      let ctx = document.getElementById("gradeChartRope");
+      let ctx = document.getElementById('gradeChartRope');
       let labels = [];
       for (let i in this.gradeTotals.total) {
-        labels.push("5." + i);
+        labels.push('5.' + i);
       }
       let filteredTrad = this.gradeTotals.trad.filter(function(el) {
         return el != null;
@@ -269,31 +267,31 @@ export default {
       });
       let boulderLabels = [];
       for (let i in this.gradeTotals.boulder) {
-        boulderLabels.push("V" + i);
+        boulderLabels.push('V' + i);
       }
       let filteredBoulder = this.gradeTotals.boulder.filter(function(el) {
         return el != null;
       });
       this.gradeChartRope = new Chart(ctx, {
-        type: "bar",
+        type: 'bar',
         data: {
           labels: labels,
           datasets: [
             {
-              label: "Trad Routes",
+              label: 'Trad Routes',
               data: filteredTrad,
-              backgroundColor: "rgba(255, 99, 132, 0.2)",
-              borderColor: "rgba(255, 99, 132, 1)",
-              borderWidth: 1
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1,
             },
             {
-              label: "Sport Routes",
+              label: 'Sport Routes',
               data: filteredSport,
-              backgroundColor: "rgba(54, 162, 235, 0.2)",
-              borderColor: "rgba(54, 162, 235, 1)",
-              borderWidth: 1
-            }
-          ]
+              backgroundColor: 'rgba(54, 162, 235, 0.2)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1,
+            },
+          ],
         },
         options: {
           scales: {
@@ -301,45 +299,45 @@ export default {
               {
                 gridLines: {
                   display: false,
-                  drawBorder: false
+                  drawBorder: false,
                 },
                 ticks: {
                   display: false,
-                  beginAtZero: true
-                }
-              }
+                  beginAtZero: true,
+                },
+              },
             ],
             xAxes: [
               {
                 gridLines: {
                   display: false,
                   drawBorder: false,
-                  beginAtZero: false
-                }
-              }
-            ]
+                  beginAtZero: false,
+                },
+              },
+            ],
           },
           legend: {
-            display: false
-          }
-        }
+            display: false,
+          },
+        },
       });
 
-      ctx = document.getElementById("gradeChartBoulder");
+      ctx = document.getElementById('gradeChartBoulder');
 
       this.gradeChartBoulder = new Chart(ctx, {
-        type: "bar",
+        type: 'bar',
         data: {
           labels: boulderLabels,
           datasets: [
             {
-              label: "Bouldering Routes",
+              label: 'Bouldering Routes',
               data: filteredBoulder,
-              backgroundColor: "rgba(255, 99, 132, 0.2)",
-              borderColor: "rgba(255, 99, 132, 1)",
-              borderWidth: 1
-            }
-          ]
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1,
+            },
+          ],
         },
         options: {
           scales: {
@@ -347,28 +345,28 @@ export default {
               {
                 gridLines: {
                   display: false,
-                  drawBorder: false
+                  drawBorder: false,
                 },
                 ticks: {
                   display: false,
-                  beginAtZero: true
-                }
-              }
+                  beginAtZero: true,
+                },
+              },
             ],
             xAxes: [
               {
                 gridLines: {
                   display: false,
                   drawBorder: false,
-                  beginAtZero: false
-                }
-              }
-            ]
+                  beginAtZero: false,
+                },
+              },
+            ],
           },
           legend: {
-            display: false
-          }
-        }
+            display: false,
+          },
+        },
       });
       // ctx = document.getElementById("typeChart");
       // let types = [this.crag.trad, this.crag.sport, this.crag.boulder]
@@ -427,11 +425,11 @@ export default {
       //     }
       //   }
       // });
-    }
+    },
   },
   mounted() {
     this.setCharts();
-  }
+  },
 };
 </script>
 

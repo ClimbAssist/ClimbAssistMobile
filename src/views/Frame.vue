@@ -31,6 +31,33 @@ export default {
   },
   methods: {
     getData() {
+      window.requestFileSystem(
+        window.PERSISTENT,
+        10 * 1024 * 1024,
+        (fs) => {
+          fs.root.getFile(
+            'crags/' +
+              this.$route.params.frame +
+              '/' +
+              this.$route.params.frame +
+              '.json',
+            { create: false },
+            (fileEntry) => {
+              this.$store.commit('setDownloaded', true);
+            },
+            (error) => {
+              console.log('error at get file');
+              console.log(error);
+              //failed to find local json file, get crag from server
+              this.$store.commit('setDownloaded', false);
+            }
+          );
+        },
+        (error) => {
+          console.log('error at request file system');
+          console.log(error);
+        }
+      );
       if (
         this.$store.state.filter.cragState &&
         this.$store.state.filter.cragState.cragId === this.$route.params.frame

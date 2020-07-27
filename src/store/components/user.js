@@ -1,13 +1,14 @@
 const state = () => ({
   username: undefined,
   email: undefined,
-  isAdministrator: false
+  isAdministrator: false,
+  fromServer: false,
 });
 const getters = {};
 const mutations = {
   updateUser: (state, payload) => {
-    state.user = payload
-  } ,
+    state.user = payload;
+  },
   updateUsername: (state, payload) => {
     state.username = payload;
   },
@@ -16,7 +17,10 @@ const mutations = {
   },
   updateIsAdministrator: (state, payload) => {
     state.isAdministrator = payload;
-  }
+  },
+  updateFromServer: (state, payload) => {
+    state.fromServer = payload;
+  },
 };
 const actions = {};
 
@@ -24,5 +28,5 @@ export default {
   state,
   getters,
   mutations,
-  actions
+  actions,
 };

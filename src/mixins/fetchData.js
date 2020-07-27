@@ -1,6 +1,7 @@
-export const fetch = {
+export const fetchData = {
   methods: {
-    fetchData() {
+    getData() {
+      this.$store.commit('updateLoadError', undefined);
       //get country data
       let countries = [];
       //fetch data
@@ -38,7 +39,6 @@ export const fetch = {
         },
         (response) => {
           //fail
-          this.$store.commit('dataSet', true);
           this.$store.commit(
             'updateLoadError',
             'There was a problem loading the data, please try again later.'

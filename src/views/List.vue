@@ -1,6 +1,6 @@
 <template>
   <v-container justify-start align-content-start>
-    <div class="text-xs-center" v-if="!dataSet">
+    <div class="text-xs-center" v-if="!dataSet && !loadError">
       <p>loading</p>
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>

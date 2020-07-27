@@ -1,5 +1,5 @@
 <template>
-  <v-container justify-start>
+  <v-container justify-start v-if="user">
     <div v-for="(crag, i) in crags" :key="i" class="d-flex flex-row pa-4">
       <span class="align-self-start">
         <router-link
@@ -59,7 +59,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import * as fs from 'fs';
 export default {
   name: 'downloads',
@@ -76,6 +75,9 @@ export default {
     };
   },
   computed: {
+    user() {
+      return this.$store.state.user.username;
+    },
     deleteComplete() {
       if (
         this.jsonDeleted &&
@@ -141,6 +143,8 @@ export default {
             directoryReader.readEntries(
               (entries) => {
                 this.dirLength = entries.length;
+                console.log('entries');
+                console.log(entries);
                 for (let i in entries) {
                   let crag = {
                     name: undefined,
@@ -165,34 +169,43 @@ export default {
                           };
                         },
                         (error) => {
-                          console.log('error reading file');
+                          console.log('error reading json file');
                           console.log(error);
                         }
                       );
                     },
                     (error) => {
-                      console.log('error at get file');
+                      console.log('error getting json file');
                       console.log(error);
                     }
                   );
                   // get file sizes
                   let entryReader = entries[i].createReader();
-                  entryReader.readEntries((files) => {
-                    for (let fi in files) {
-                      files[fi].file((file) => {
-                        crag.size += file.size;
-                      });
+                  entryReader.readEntries(
+                    (files) => {
+                      for (let fi in files) {
+                        files[fi].file((file) => {
+                          crag.size += file.size;
+                        });
+                      }
+                    },
+                    (error) => {
+                      console.log('error reading files in crag foleder');
+                      console.log(error);
                     }
-                  });
+                  );
                   this.crags.push(crag);
+                  console.log(this.crags);
                 }
               },
               (error) => {
+                console.log('error reading entries in crags');
                 console.log(error);
               }
             );
           },
           (error) => {
+            console.log('error getting crags directory');
             console.log(error);
           }
         );

@@ -1,12 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.vue.example.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>ClimbAssistApp</name>
+<widget id="com.climbassist.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>ClimbAssist (beta)</name>
     <description>
         Climb Assist Cordova application.
     </description>
     <author email="dev@climbassist.com" href="http://climbassist.com">
         Climb Assist Team
     </author>
+    <icon src="www/img/logo.deb63e2c.png" />
     <!-- this hook will point your config.xml to the DevServer on Serve -->
     <hook type="after_prepare" src="../node_modules/vue-cli-plugin-cordova/serve-config-hook.js" />
     <content src="index.html" />

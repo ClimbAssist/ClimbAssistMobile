@@ -24,6 +24,10 @@
     <v-card>
       <v-btn @click="deleteFiles()"> Delete Files</v-btn>
     </v-card>
+    <v-card>
+      <v-btn @click="checkLocalLogin()"> Get Last Login </v-btn>
+      <p>Last Login: {{ lastLogin }}</p>
+    </v-card>
     {{ json }}
   </v-container>
 </template>
@@ -42,6 +46,7 @@ export default {
       subEntries: undefined,
       lastModified: undefined,
       size: undefined,
+      lastLogin: undefined,
     };
   },
   computed: {
@@ -353,6 +358,33 @@ export default {
           console.log(error);
         }
       );
+    },
+    checkLocalLogin() {
+      window.requestFileSystem(window.PERSISTENT, 10 * 1024 * 1024, (fs) => {
+        console.log('file system open: ' + fs.name);
+        console.log(fs.root);
+        fs.root.getFile(
+          'localUser.json',
+          { create: false },
+          (fileEntry) => {
+            console.log(fileEntry);
+            fileEntry.file(
+              (file) => {
+                this.lastLogin = new Date(file.lastModified);
+              },
+              (error) => {
+                console.log('error reading file');
+                console.log(error);
+              }
+            );
+          },
+          (error) => {
+            console.log('error getting file');
+            console.log(error);
+            this.lastLogin = 'none';
+          }
+        );
+      });
     },
   },
 };
