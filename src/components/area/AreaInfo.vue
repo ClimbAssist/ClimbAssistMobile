@@ -44,12 +44,12 @@
     </v-layout>
     <v-layout row justify-center>
       <v-flex sm10 xs12>
-        <canvas id="gradeChartRope" height="50" />
+        <canvas id="gradeChartRope" :height="ropeShow" />
       </v-flex>
     </v-layout>
     <v-layout row justify-center>
       <v-flex sm10 xs12>
-        <canvas id="gradeChartBoulder" height="0" />
+        <canvas id="gradeChartBoulder" :height="boulderShow" />
       </v-flex>
     </v-layout>
     <v-container>
@@ -57,35 +57,71 @@
         <v-toolbar dark color="primary">
           <v-toolbar-title>{{ area.name }}</v-toolbar-title>
         </v-toolbar>
-        <v-expansion-panels v-if="area.filteredSubAreas.length > 1">
-          <v-expansion-panel>
+        <v-expansion-panels
+          v-if="
+            area.area.subAreas.length > 1 ||
+              area.area.subAreas[0].name !== area.name
+          "
+        >
+          <v-expansion-panel
+            v-for="(subArea, subi) in area.filteredSubAreas"
+            :key="subi"
+          >
             <v-expansion-panel-header>
-              {{ subArea.name }} - {{ subArea.trad }} trad
-              {{ subArea.sport }} sport {{ subArea.boulder }} boulder
+              <v-flex class="text-left" justify-center>
+                {{ subArea.name }} -
+                <span v-if="subArea.trad"
+                  >{{ subArea.trad }}
+                  <span class="trad-style"> trad </span></span
+                >
+                <span v-if="subArea.sport"
+                  >{{ subArea.sport }}
+                  <span class="sport-style"> sport </span></span
+                >
+                <span v-if="subArea.boulder"
+                  >{{ subArea.boulder }}
+                  <span class="boulder-style"> boulder </span></span
+                >
+              </v-flex>
             </v-expansion-panel-header>
-            <v-expansion-panel-content
-              v-for="(subArea, subi) in area.filteredSubAreas"
-              :key="subi"
-            >
-              <v-layout
-                pa-4
-                row
-                v-for="(crag, ci) in subArea.filteredCrags"
-                :key="ci"
-              >
+            <v-expansion-panel-content>
+              <v-layout wrap>
+                <v-flex xs12 sm2 offset-sm1>
+                  <v-card-text>
+                    <h3 class="text-sm-right text-xs-center">Description:</h3>
+                  </v-card-text>
+                </v-flex>
+                <v-flex xs12 sm8 fill-height>
+                  <v-card-text
+                    class="text-sm-left text-xs-center"
+                    style="white-space: pre-line;"
+                    >{{ subArea.subArea.description }}</v-card-text
+                  >
+                </v-flex>
+              </v-layout>
+              <v-layout v-for="(crag, ci) in subArea.filteredCrags" :key="ci">
                 <router-link
                   :to="{
-                    name: 'frame',
+                    name: 'crags',
                     params: {
                       subAreaKey: subArea.subAreaKey,
                       cragKey: crag.cragKey,
-                      area: area.slug,
-                      frame: crag.slug,
+                      area: area.areaId,
+                      frame: crag.cragId,
                     },
                   }"
-                  >{{ crag.name }} - {{ crag.trad }} trad {{ crag.sport }} sport
-                  {{ crag.boulder }} boulder</router-link
+                  >{{ crag.name }}</router-link
+                >&nbsp; - &nbsp;<span v-if="crag.trad"
+                  >{{ crag.trad }} <span class="trad-style"> trad </span>
+                </span>
+                <span v-if="crag.sport"
+                  >{{ crag.sport
+                  }}<span class="sport-style"> sport </span></span
                 >
+                <span v-if="crag.boulder">
+                  {{ crag.boulder }}
+                  <span class="boulder-style"> boulder </span>
+                </span>
               </v-layout>
             </v-expansion-panel-content>
           </v-expansion-panel>
@@ -102,8 +138,8 @@
                 params: {
                   subAreaKey: 0,
                   cragKey: crag.cragKey,
-                  area: area.slug,
-                  frame: crag.slug,
+                  area: area.areaId,
+                  frame: crag.cragId,
                 },
               }"
               >{{ crag.name }} - {{ crag.trad }} trad {{ crag.sport }} sport
@@ -121,12 +157,14 @@ import { mapGetters } from 'vuex';
 import Chart from 'chart.js';
 export default {
   data() {
-    return {};
+    return {
+      ropeShow: 0,
+      boulderShow: 0,
+    };
   },
   watch: {
     gradeTotals: {
       handler() {
-        console.log(this.gradeTotals);
         let filteredTrad = this.gradeTotals.trad.filter(function(el) {
           return el != null;
         });
@@ -163,9 +201,6 @@ export default {
     ...mapGetters({
       area: 'area',
     }),
-    filter() {
-      return this.$store.state.filter.filter;
-    },
     gradeTotals() {
       let gradeTotals = {
         trad: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -173,47 +208,24 @@ export default {
         boulder: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         total: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       };
-      for (let skey in this.area.filteredSubAreas) {
-        for (let ckey in this.area.filteredSubAreas[skey].filteredCrags) {
-          for (let wkey in this.area.filteredSubAreas[skey].filteredCrags[ckey]
-            .walls) {
-            for (let rkey in this.area.filteredSubAreas[skey].filteredCrags[
+      for (let subkey in this.area.filteredSubAreas) {
+        for (let ckey in this.area.filteredSubAreas[subkey].filteredCrags) {
+          for (let wkey in this.area.filteredSubAreas[subkey].filteredCrags[
+            ckey
+          ].walls) {
+            for (let rkey in this.area.filteredSubAreas[subkey].filteredCrags[
               ckey
             ].walls[wkey].routes) {
-              if (
-                this.area.filteredSubAreas[skey].filteredCrags[ckey].walls[wkey]
-                  .routes[rkey].style === 'trad'
-              ) {
-                gradeTotals.trad[
-                  this.area.filteredSubAreas[skey].filteredCrags[ckey].walls[
-                    wkey
-                  ].routes[rkey].grade
-                ]++;
-                gradeTotals.total[
-                  this.area.filteredSubAreas[skey].filteredCrags[ckey].walls[
-                    wkey
-                  ].routes[rkey].grade
-                ]++;
-              } else if (
-                this.area.filteredSubAreas[skey].filteredCrags[ckey].walls[wkey]
-                  .routes[rkey].style === 'sport'
-              ) {
-                gradeTotals.sport[
-                  this.area.filteredSubAreas[skey].filteredCrags[ckey].walls[
-                    wkey
-                  ].routes[rkey].grade
-                ]++;
-                gradeTotals.total[
-                  this.area.filteredSubAreas[skey].filteredCrags[ckey].walls[
-                    wkey
-                  ].routes[rkey].grade
-                ]++;
+              let route = this.area.filteredSubAreas[subkey].filteredCrags[ckey]
+                .walls[wkey].routes[rkey];
+              if (route.style === 'trad') {
+                gradeTotals.trad[route.grade]++;
+                gradeTotals.total[route.grade]++;
+              } else if (route.style === 'sport') {
+                gradeTotals.sport[route.grade]++;
+                gradeTotals.total[route.grade]++;
               } else {
-                gradeTotals.boulder[
-                  this.area.filteredSubAreas[skey].filteredCrags[ckey].walls[
-                    wkey
-                  ].routes[rkey].grade
-                ]++;
+                gradeTotals.boulder[route.grade]++;
               }
             }
           }
@@ -222,37 +234,40 @@ export default {
       for (let gkey in gradeTotals.total) {
         if (gradeTotals.total[gkey] === 0) {
           delete gradeTotals.total[gkey];
+          delete gradeTotals.trad[gkey];
+          delete gradeTotals.sport[gkey];
         }
         if (gradeTotals.boulder[gkey] === 0) {
           delete gradeTotals.boulder[gkey];
         }
       }
-      for (let i in gradeTotals.trad) {
-        if (gradeTotals.total[i] == null) {
-          delete gradeTotals.trad[i];
-          delete gradeTotals.sport[i];
-        }
-      }
       return gradeTotals;
-    },
-    boulderShow() {
-      for (let i in gradeTotals.boulder) {
-        if (this.gradeTotals.boulder[i]) {
-          return 100;
-        }
-      }
-      return 0;
-    },
-    ropeShow() {
-      for (let i in gradeTotals.boulder) {
-        if (this.gradeTotals.boulder[i]) {
-          return 100;
-        }
-      }
-      return 0;
     },
   },
   methods: {
+    setChartShow() {
+      for (let subkey in this.area.area.subAreas) {
+        for (let ckey in this.area.area.subAreas[subkey].crags) {
+          for (let wkey in this.area.area.subAreas[subkey].crags[ckey].walls) {
+            for (let rkey in this.area.area.subAreas[subkey].crags[ckey].walls[
+              wkey
+            ].routes) {
+              let route = this.area.area.subAreas[subkey].crags[ckey].walls[
+                wkey
+              ].routes[rkey];
+              if (this.ropeShow === 100 && this.boulderShow === 100) {
+                return;
+              }
+              if (route.style === 'trad' || route.style === 'sport') {
+                this.ropeShow = 100;
+              } else if (route.style === 'boulder') {
+                this.boulderShow = 100;
+              }
+            }
+          }
+        }
+      }
+    },
     setCharts() {
       let ctx = document.getElementById('gradeChartRope');
       let labels = [];
@@ -333,8 +348,8 @@ export default {
             {
               label: 'Bouldering Routes',
               data: filteredBoulder,
-              backgroundColor: 'rgba(255, 99, 132, 0.2)',
-              borderColor: 'rgba(255, 99, 132, 1)',
+              backgroundColor: 'rgba(255, 204, 51, 0.2)',
+              borderColor: 'rgba(255, 255, 51, 1)',
               borderWidth: 1,
             },
           ],
@@ -427,6 +442,9 @@ export default {
       // });
     },
   },
+  created() {
+    this.setChartShow();
+  },
   mounted() {
     this.setCharts();
   },
@@ -441,6 +459,6 @@ export default {
   color: #0066ff;
 }
 .boulder-style {
-  color: #33cc66;
+  color: #efd369;
 }
 </style>

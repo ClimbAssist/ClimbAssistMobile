@@ -75,10 +75,12 @@
             </v-card>
           </v-dialog>
         </v-layout>
-        <v-layout row justify-start>
+        <v-layout row justify-center>
           <router-link to="/terms-and-conditions">
             terms and conditions
           </router-link>
+        </v-layout>
+        <v-layout row justify-center>
           <router-link to="/contact">
             contact us
           </router-link>
@@ -153,31 +155,39 @@ export default {
   },
   methods: {
     async logout() {
-      this.$axios
-        .$post('/v1/user/sign-out')
-        .then((res) => {
+      cordova.plugin.http.post(
+        'https://www.climbassist.com/v1/user/sign-out',
+        {},
+        {},
+        (response) => {
+          //success
+          this.$store.commit('updateFromServer', false);
+          this.$store.commit('updateUsername', undefined);
+          this.$store.commit('updateEmail', undefined);
+          this.$store.commit('updateUser', undefined);
+          this.$store.commit('updateDialogOpen', true);
+          this.$router.push('/');
+          this.$store.commit('updateDialogComponent', 'login');
+
           this.$store.commit('snackbar/updateType', 'success');
           this.$store.commit('snackbar/updateTimeout', 10000);
           this.$store.commit('snackbar/updateMessage', 'Logged Out');
           this.$store.commit('snackbar/updateSnackbar', true);
           this.$store.commit('snackbar/link', undefined);
           this.$store.commit('snackbar/linkMessage', undefined);
-
-          //user
-          this.$store.commit('user/updateUsername', undefined);
-          this.$store.commit('user/updateEmail', undefined);
-          this.$store.commit('user/updateIsAdministrator', false);
-
-          this.$router.push('/');
-        })
-        .catch((err) => {
-          this.$store.commit('snackbar/updateType', 'error');
-          this.$store.commit('snackbar/updateTimeout', 10000);
-          this.$store.commit('snackbar/updateMessage', err.message);
-          this.$store.commit('snackbar/updateSnackbar', true);
-          this.$store.commit('snackbar/link', undefined);
-          this.$store.commit('snackbar/linkMessage', undefined);
-        });
+        },
+        (response) => {
+          //fail user not loggged in
+          this.$store.commit('updateUserError', response);
+          console.log(response);
+          this.$store.commit('updateType', 'error');
+          this.$store.commit('updateTimeout', 10000);
+          this.$store.commit('updateMessage', err.message);
+          this.$store.commit('updateSnackbar', true);
+          this.$store.commit('link', undefined);
+          this.$store.commit('linkMessage', undefined);
+        }
+      );
     },
     deleteUser() {
       this.$axios

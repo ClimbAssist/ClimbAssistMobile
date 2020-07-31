@@ -105,7 +105,6 @@ export default {
   computed: {},
   mixins: [fetchUser],
   methods: {
-    switchComponent() {},
     async sendPassReset() {
       let obj;
       if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.email)) {

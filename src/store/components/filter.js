@@ -11,13 +11,13 @@ const state = {
   mapBounds: undefined,
   countries: [],
   cragState: {
-    name: null,
-    cragId: null,
-    subAreaId: null,
-    imageLocation: null,
-    description: null,
-    location: null,
-    model: null,
+    name: undefined,
+    cragId: undefined,
+    subAreaId: undefined,
+    imageLocation: undefined,
+    description: undefined,
+    location: undefined,
+    model: undefined,
     walls: [],
   },
   areaState: {
@@ -349,7 +349,7 @@ const getters = {
   area: (state) => {
     const areaTotals = {
       name: state.areaState.name,
-      slug: state.areaState.areaId,
+      areaId: state.areaState.areaId,
       area: state.areaState,
       trad: 0,
       sport: 0,
@@ -359,8 +359,9 @@ const getters = {
     for (let subkey in state.areaState.subAreas) {
       const subAreaTotals = {
         name: state.areaState.subAreas[subkey].name,
-        slug: state.areaState.subAreas[subkey].subAreaId,
+        areaId: state.areaState.subAreas[subkey].subAreaId,
         subAreaKey: subkey,
+        subArea: state.areaState.subAreas[subkey],
         trad: 0,
         sport: 0,
         boulder: 0,
@@ -373,7 +374,7 @@ const getters = {
           crag: state.areaState.subAreas[subkey].crags[ckey],
           location: state.areaState.subAreas[subkey].crags[ckey].location,
           area: state.areaState.name,
-          slug: state.areaState.subAreas[subkey].crags[ckey].cragId,
+          cragId: state.areaState.subAreas[subkey].crags[ckey].cragId,
           cragKey: ckey,
           trad: 0,
           sport: 0,

@@ -1,14 +1,14 @@
 <template>
   <section id="signup">
-    <VContainer>
-      <VLayout>
-        <VFlex xs12>
+    <v-container>
+      <v-layout>
+        <v-flex xs12>
           <v-img src="@/assets/logo.png" class="mb-3 mx-auto" width="80" />
           <h2>Create your Climb Assist Account!</h2>
-          <VForm ref="form" v-model="form" class="mb-5">
-            <VContainer>
-              <VLayout wrap>
-                <VFlex xs12>
+          <v-form ref="form" v-model="form" class="mb-5">
+            <v-container>
+              <v-layout wrap>
+                <v-flex xs12>
                   <VTextField
                     v-model="username"
                     :rules="[
@@ -20,8 +20,8 @@
                     persistent-hint
                     validate-on-blur
                   />
-                </VFlex>
-                <VFlex xs12>
+                </v-flex>
+                <v-flex xs12>
                   <VTextField
                     v-model="email"
                     :rules="[
@@ -32,8 +32,8 @@
                     label="Email"
                     name="email"
                   />
-                </VFlex>
-                <VFlex md6 xs12>
+                </v-flex>
+                <v-flex md6 xs12>
                   <VTextField
                     v-model="password"
                     :append-icon="show ? 'fa-eye' : 'fa-eye-slash'"
@@ -45,8 +45,8 @@
                     label="Password"
                     @click:append="show = !show"
                   />
-                </VFlex>
-                <VFlex md6 xs12>
+                </v-flex>
+                <v-flex md6 xs12>
                   <VTextField
                     v-model="confirmPassword"
                     :append-icon="showConfirm ? 'fa-eye' : 'fa-eye-slash'"
@@ -59,22 +59,22 @@
                     validate-on-blur
                     @click:append="showConfirm = !showConfirm"
                   />
-                </VFlex>
-                <VFlex xs12>
+                </v-flex>
+                <v-flex xs12>
                   <VMessages
                     :value="[
                       'Use 8 or more characters with a mix of letters, numbers & symbols',
                     ]"
                   />
-                </VFlex>
-              </VLayout>
-              <VLayout align-center justify-space-between pt-3>
+                </v-flex>
+              </v-layout>
+              <v-layout align-center justify-space-between pt-3>
                 <!-- <vue-recaptcha
                   sitekey="6Ld-Nl0UAAAAAN2imm8GeEIPU_Ve63A1DJFY33pT"
                   :loadRecaptchaScript="true"
                 >
                 </vue-recaptcha> -->
-                <VFlex shrink>
+                <v-flex shrink>
                   <v-btn
                     :disabled="!form"
                     :loading="isLoading"
@@ -84,13 +84,13 @@
                   >
                     Submit
                   </v-btn>
-                </VFlex>
-              </VLayout>
-            </VContainer>
-          </VForm>
-        </VFlex>
-      </VLayout>
-    </VContainer>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-form>
+        </v-flex>
+      </v-layout>
+    </v-container>
   </section>
 </template>
 
@@ -122,16 +122,19 @@ export default {
     return data;
   },
   methods: {
-    submit() {
+    async submit() {
       if (!this.$refs.form.validate()) return;
       this.isLoading = true;
-      this.$axios
-        .post('/v1/user/register', {
+      await cordova.plugin.http.post(
+        'https://www.climbassist.com/v1/user/register',
+        {
           username: this.username,
           email: this.email,
           password: this.password,
-        })
-        .then((res) => {
+        },
+        {},
+        (response) => {
+          //success get user fetchUser.js mixin
           this.$store.commit('snackbar/updateType', 'success');
           this.$store.commit('snackbar/updateTimeout', 10000);
           this.$store.commit(
@@ -143,16 +146,19 @@ export default {
           this.$store.commit('snackbar/linkMessage', undefined);
 
           this.$router.push('/user/confirmation');
-        })
-        .catch((err) => {
+        },
+        (response) => {
+          console.log(response);
+          //post failed
           this.$store.commit('snackbar/updateType', 'error');
           this.$store.commit('snackbar/updateTimeout', 10000);
           this.$store.commit('snackbar/updateMessage', err.message);
           this.$store.commit('snackbar/updateSnackbar', true);
           this.$store.commit('snackbar/link', undefined);
           this.$store.commit('snackbar/linkMessage', undefined);
-        })
-        .finally(() => (this.isLoading = false));
+        }
+      );
+      this.isLoading = false;
     },
   },
   // components: { VueRecaptcha },

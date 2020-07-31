@@ -22,11 +22,11 @@
         <span>map</span>
         <v-icon>fa-map</v-icon>
       </v-btn>
+      <!-- <v-icon @click="download()">fa-download</v-icon> -->
     </v-bottom-navigation>
     <v-bottom-navigation
       v-if="sidebar === 'areaV'"
       app
-
       v-model="areaTabs"
       :value="true"
       color="white"
@@ -45,29 +45,34 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters } from 'vuex';
 export default {
-  name: "bottomNav",
+  name: 'bottomNav',
   computed: {
     frameTabs: {
       get() {
         return this.$store.state.frame.frameTabs;
       },
       set(value) {
-        this.$store.commit("cragView", value);
-      }
+        this.$store.commit('cragView', value);
+      },
     },
     areaTabs: {
       get() {
         return this.$store.state.area.areaTabs;
       },
       set(value) {
-        this.$store.commit("areaView", value);
-      }
+        this.$store.commit('areaView', value);
+      },
     },
     sidebar() {
       return this.$store.state.sidebar.sidebar;
-    }
-  }
+    },
+  },
+  methods: {
+    download() {
+      console.log('in download func');
+    },
+  },
 };
 </script>

@@ -22,27 +22,31 @@ export default {
   },
   computed: {
     crag() {
-      return this.$store.state.filter.cragState;
+      return this.$store.state.filter.cragState.name;
     },
     area() {
-      return this.$store.state.filter.areaState;
+      return this.$store.state.filter.areaState.name;
     },
     sidebar() {
       return this.$store.state.sidebar.sidebar;
     },
     cragName() {
-      var cragName =
-        this.crag.name.length > this.length
-          ? this.crag.name.substring(0, this.length - 3) + '...'
-          : this.crag.name;
-      return cragName;
+      if (this.crag) {
+        var cragName =
+          this.crag.length > this.length
+            ? this.crag.substring(0, this.length - 3) + '...'
+            : this.crag;
+        return cragName;
+      }
     },
     areaName() {
-      var areaName =
-        this.crag.name.length > this.length
-          ? this.area.name.substring(0, this.length - 3) + '...'
-          : this.area.name;
-      return areaName;
+      if (this.area) {
+        var areaName =
+          this.area.length > this.length
+            ? this.area.substring(0, this.length - 3) + '...'
+            : this.area;
+        return areaName;
+      }
     },
   },
 };

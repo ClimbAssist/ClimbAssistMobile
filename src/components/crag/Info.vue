@@ -83,41 +83,16 @@
               </v-card-text>
             </v-flex>
           </v-layout>
-          <!-- <v-layout row>
-            <v-flex xs4 sm2 offset-sm1>
-              <v-card-text>
-                <h3 class="text-xs-right">Grades:</h3>
-              </v-card-text>
-            </v-flex>
-            <v-flex offset-sm1>
-              <v-card-text>
-                <p class="text-xs-left">
-                  <span v-for="(grade, i) in gradeTotals.total"
-                    ><span class="grade-numbers" v-if="grade"
-                      >5.{{ i }}: {{ grade }}
-                    </span></span
-                  >
-                </p>
-              </v-card-text>
-            </v-flex>
-          </v-layout> -->
           <v-layout row justify-center>
-            <!-- <v-flex sm12 md6>
-              <canvas id="typeChart" />
-            </v-flex> -->
             <v-flex sm10 xs12>
               <canvas id="gradeChartRope" :height="ropeShow" />
             </v-flex>
           </v-layout>
           <v-layout row justify-center>
-            <!-- <v-flex sm12 md6>
-              <canvas id="typeChart" />
-            </v-flex> -->
             <v-flex sm10 xs12>
               <canvas id="gradeChartBoulder" :height="boulderShow" />
             </v-flex>
           </v-layout>
-          <!-- {{ panel }} -->
           <!-- wall card -->
           <v-flex v-for="(wall, i) in crag.walls" :key="i">
             <v-toolbar color="primary" dark>
@@ -360,6 +335,8 @@ export default {
       apiWalls: null,
       apiRoutes: [],
       downloading: false,
+      ropeShow: 0,
+      boulderShow: 0,
       // routeCheck: null
     };
   },
@@ -367,20 +344,6 @@ export default {
     ...mapGetters({
       crag: 'crag',
     }),
-    boulderShow() {
-      if (this.ropeTotals != null) {
-        return 100;
-      } else {
-        return 0;
-      }
-    },
-    ropeShow() {
-      if (this.gradeTotals.total != null) {
-        return 100;
-      } else {
-        return 0;
-      }
-    },
     activeRoute() {
       return this.$store.state.frame.activeRoute;
     },
@@ -426,15 +389,11 @@ export default {
       for (let gkey in gradeTotals.total) {
         if (gradeTotals.total[gkey] === 0) {
           delete gradeTotals.total[gkey];
+          delete gradeTotals.trad[gkey];
+          delete gradeTotals.sport[gkey];
         }
         if (gradeTotals.boulder[gkey] === 0) {
           delete gradeTotals.boulder[gkey];
-        }
-      }
-      for (let i in gradeTotals.trad) {
-        if (gradeTotals.total[i] == null) {
-          delete gradeTotals.trad[i];
-          delete gradeTotals.sport[i];
         }
       }
       return gradeTotals;
@@ -476,7 +435,25 @@ export default {
         window.scrollBy(0, -90); // Adjust scrolling with a negative value here
       }
     },
+    setChartShow() {
+      console.log('setting chart space');
+      for (let wi in this.crag.crag.walls) {
+        for (let ri in this.crag.crag.walls[wi].routes) {
+          if (this.ropeShow === 100 && this.boulderShow === 100) {
+            break;
+          } else if (
+            this.crag.crag.walls[wi].routes[ri].style === 'trad' ||
+            this.crag.crag.walls[wi].routes[ri].style === 'sport'
+          ) {
+            this.ropeShow = 100;
+          } else if (this.crag.crag.walls[wi].routes[ri].style === 'boulder') {
+            this.boulderShow = 100;
+          }
+        }
+      }
+    },
     setCharts() {
+      console.log('setting chart data');
       let ctx = document.getElementById('gradeChartRope');
       let labels = [];
       for (let i in this.gradeTotals.total) {
@@ -556,8 +533,8 @@ export default {
             {
               label: 'Bouldering Routes',
               data: filteredBoulder,
-              backgroundColor: 'rgba(255, 99, 132, 0.2)',
-              borderColor: 'rgba(255, 99, 132, 1)',
+              backgroundColor: 'rgba(255, 204, 51, 0.2)',
+              borderColor: 'rgba(255, 255, 51, 1)',
               borderWidth: 1,
             },
           ],
@@ -775,36 +752,48 @@ export default {
     gradeTotals: {
       handler() {
         console.log(this.gradeTotals);
-        let filteredTrad = this.gradeTotals.trad.filter(function(el) {
-          return el != null;
-        });
-        let filteredSport = this.gradeTotals.sport.filter(function(el) {
-          return el != null;
-        });
-        let labels = [];
-        for (let i in this.gradeTotals.total) {
-          labels.push('5.' + i);
-        }
-        this.gradeChartRope.data.datasets[0].data = filteredTrad;
-        this.gradeChartRope.data.datasets[1].data = filteredSport;
-        this.gradeChartRope.data.labels = labels;
-        this.gradeChartRope.update();
+        if (this.gradeChartRope && this.gradeChartBoulder) {
+          let filteredTrad = this.gradeTotals.trad.filter(function(el) {
+            return el != null;
+          });
+          let filteredSport = this.gradeTotals.sport.filter(function(el) {
+            return el != null;
+          });
+          let labels = [];
+          for (let i in this.gradeTotals.total) {
+            labels.push('5.' + i);
+          }
+          this.gradeChartRope.data.datasets[0].data = filteredTrad;
+          this.gradeChartRope.data.datasets[1].data = filteredSport;
+          this.gradeChartRope.data.labels = labels;
+          this.gradeChartRope.update();
 
-        let boulderLabels = [];
-        for (let i in this.gradeTotals.boulder) {
-          boulderLabels.push('V' + i);
-        }
+          let boulderLabels = [];
+          for (let i in this.gradeTotals.boulder) {
+            boulderLabels.push('V' + i);
+          }
 
-        let filteredBoulder = this.gradeTotals.boulder.filter(function(el) {
-          return el != null;
-        });
-        this.gradeChartBoulder.data.datasets[0].data = filteredBoulder;
-        this.gradeChartBoulder.data.labels = boulderLabels;
-        this.gradeChartBoulder.update();
+          let filteredBoulder = this.gradeTotals.boulder.filter(function(el) {
+            return el != null;
+          });
+          this.gradeChartBoulder.data.datasets[0].data = filteredBoulder;
+          this.gradeChartBoulder.data.labels = boulderLabels;
+          this.gradeChartBoulder.update();
+        }
 
         // this.typeChart.data.datasets[0].data = [this.crag.trad, this.crag.sport, this.crag.boulder]
         // this.typeChart.update()
       },
+    },
+    crag: {
+      async handler() {
+        if (this.crag.name) {
+          console.log('setting up charts');
+          await this.setChartShow();
+          this.setCharts();
+        }
+      },
+      deep: true,
     },
     // routeCheck: {
     //   handler() {
@@ -820,8 +809,15 @@ export default {
     //   }
     // }
   },
+  created() {
+    if (this.crag.name) {
+      this.setChartShow();
+    }
+  },
   mounted() {
-    this.setCharts();
+    if (this.crag.name) {
+      this.setCharts();
+    }
   },
   activated() {
     this.scrollRoute();
@@ -844,6 +840,6 @@ export default {
   color: #0066ff;
 }
 .boulder-style {
-  color: #33cc66;
+  color: #efd369;
 }
 </style>

@@ -231,9 +231,9 @@ export default {
   created() {
     this.$store.commit('updateFilterText', '');
     this.$store.commit('cragView', 'info');
+    this.getData();
   },
   mounted() {
-    this.getData();
     this.$store.commit('updateSidebar', 'frameV');
   },
   destroyed() {
@@ -241,6 +241,16 @@ export default {
     this.$store.commit('cragView', null);
     this.$store.commit('updateActiveRoute', null);
     this.$store.commit('setDownloaded', false);
+    this.$store.commit('updateCrag', {
+      name: undefined,
+      cragId: undefined,
+      subAreaId: undefined,
+      imageLocation: undefined,
+      description: undefined,
+      location: undefined,
+      model: undefined,
+      walls: [],
+    });
   },
 };
 </script>

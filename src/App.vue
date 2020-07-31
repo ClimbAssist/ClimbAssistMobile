@@ -212,10 +212,10 @@
         </v-container>
       </v-bottom-sheet>
     </v-app-bar>
-    <v-content d-inline>
+    <v-main d-inline>
       <snackbar />
       <router-view />
-    </v-content>
+    </v-main>
     <bottomNav />
     <v-dialog fullscreen persistent :value="dialog.open">
       <v-card>
@@ -450,7 +450,6 @@ export default {
   },
   created() {
     this.getUser();
-    cordova.plugin.http.setDataSerializer('json');
   },
   mounted() {
     document.addEventListener('online', this.onOnline, false);

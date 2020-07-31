@@ -103,9 +103,9 @@ export default {
               properties: {
                 title: this.filteredRoutes.areas[akey].filteredSubAreas[subkey]
                   .filteredCrags[ckey].name,
-                area: this.filteredRoutes.areas[akey].slug,
+                area: this.filteredRoutes.areas[akey].areaId,
                 frame: this.filteredRoutes.areas[akey].filteredSubAreas[subkey]
-                  .filteredCrags[ckey].slug,
+                  .filteredCrags[ckey].cragId,
                 trad: this.filteredRoutes.areas[akey].filteredSubAreas[subkey]
                   .filteredCrags[ckey].trad,
                 sport: this.filteredRoutes.areas[akey].filteredSubAreas[subkey]
@@ -116,9 +116,9 @@ export default {
                 countryKey: this.filteredRoutes.areas[akey].filteredSubAreas[
                   subkey
                 ].filteredCrags[ckey].countryKey,
-                stateKey: this.filteredRoutes.areas[akey].filteredSubAreas[
+                regionKey: this.filteredRoutes.areas[akey].filteredSubAreas[
                   subkey
-                ].filteredCrags[ckey].stateKey,
+                ].filteredCrags[ckey].regionKey,
                 areaKey: this.filteredRoutes.areas[akey].filteredSubAreas[
                   subkey
                 ].filteredCrags[ckey].areaKey,
@@ -155,12 +155,12 @@ export default {
           },
           properties: {
             title: this.filteredRoutes.areas[key].name,
-            area: this.filteredRoutes.areas[key].slug,
+            area: this.filteredRoutes.areas[key].areaId,
             trad: this.filteredRoutes.areas[key].trad,
             sport: this.filteredRoutes.areas[key].sport,
             boulder: this.filteredRoutes.areas[key].boulder,
             countryKey: this.filteredRoutes.areas[key].countryKey,
-            stateKey: this.filteredRoutes.areas[key].stateKey,
+            regionKey: this.filteredRoutes.areas[key].regionKey,
             areaKey: this.filteredRoutes.areas[key].areaKey,
             maps: mapnum,
           },
@@ -336,10 +336,10 @@ export default {
 
           const feature = features[0];
           this.$router.push({
-            name: 'area-frame',
+            name: 'frame',
             params: {
               countryKey: feature.properties.countryKey,
-              stateKey: feature.properties.stateKey,
+              regionKey: feature.properties.regionKey,
               areaKey: feature.properties.areaKey,
               subAreaKey: feature.properties.subAreaKey,
               cragKey: feature.properties.cragKey,
@@ -384,18 +384,17 @@ export default {
         });
 
         map.on('zoomend', () => {
-          let zoom = map.getZoom();
           this.zoom = map.getZoom();
-          if (zoom < this.cragThreshold) {
-            this.$store.commit('updateSidebar', 'mapareaV');
-          } else {
-            this.$store.commit('updateSidebar', 'mapcragV');
-          }
+          // if (this.zoom < this.cragThreshold) {
+          //   this.$store.commit('updateSidebar', 'mapareaV');
+          // } else {
+          //   this.$store.commit('updateSidebar', 'mapcragV');
+          // }
         });
-        map.on('moveend', () => {
-          var bounds = map.getBounds();
-          this.$store.commit('updateMapBounds', bounds);
-        });
+        // map.on('moveend', () => {
+        //   var bounds = map.getBounds();
+        //   this.$store.commit('updateMapBounds', bounds);
+        // });
 
         map.on('mousemove', 'areasText', (e) => {
           // Change the cursor style as a UI indicator.
@@ -448,7 +447,7 @@ export default {
             name: 'area',
             params: {
               countryKey: feature.properties.countryKey,
-              stateKey: feature.properties.stateKey,
+              regionKey: feature.properties.regionKey,
               areaKey: feature.properties.areaKey,
               area: feature.properties.area,
             },
@@ -495,7 +494,7 @@ export default {
             name: 'area',
             params: {
               countryKey: feature.properties.countryKey,
-              stateKey: feature.properties.stateKey,
+              regionKey: feature.properties.regionKey,
               areaKey: feature.properties.areaKey,
               area: feature.properties.area,
             },
@@ -606,11 +605,11 @@ export default {
   },
   mounted() {
     this.createMap();
-    this.$store.commit('updateSidebar', 'mapareaV');
+    // this.$store.commit('updateSidebar', 'mapareaV');
   },
   destroyed() {
     this.$store.commit('updateSidebar', 'defaultV');
-    this.$store.commit('updateMapBounds', undefined);
+    // this.$store.commit('updateMapBounds', undefined);
   },
 };
 </script>
