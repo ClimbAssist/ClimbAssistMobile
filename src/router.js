@@ -9,6 +9,7 @@ import Terms from '@/views/Terms';
 import FileTest from '@/components/FileTest';
 import Downloads from '@/views/Downloads';
 import User from '@/views/User';
+import Contact from '@/views/Contact';
 
 Vue.use(Router);
 
@@ -58,6 +59,11 @@ export default new Router({
       path: '/user',
       name: 'user',
       component: User,
+    },
+    {
+      path: '/contact',
+      name: 'contact',
+      component: Contact,
     },
   ],
 });
