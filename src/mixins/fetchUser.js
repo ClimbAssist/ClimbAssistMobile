@@ -2,7 +2,7 @@ import { fetchData } from './fetchData.js';
 export const fetchUser = {
   mixins: [fetchData],
   methods: {
-    getUser() {
+    getUser(retries = 3) {
       const userData = cordova.plugin.http.get(
         'https://www.climbassist.com/v1/user',
         {},
@@ -30,6 +30,8 @@ export const fetchUser = {
               'updateLoadError',
               "Unable to connect to the internet. We'll try again when you have service."
             );
+          } else if (retries > 0) {
+            this.getUser(retries - 1);
           } else {
             // go to login
             console.log('open login dialog');

@@ -2,12 +2,9 @@
   <v-container>
     <v-flex xs12 sm10 offset-sm1>
       <v-card>
-        <v-btn
-          v-if="!downloaded"
-          @click="downloadFiles()"
-          :disabled="downlading"
-          >download</v-btn
-        >
+        <v-card-title>
+          {{ crag.name }}
+        </v-card-title>
         <!-- <v-card-title>
           <nuxt-link
             style="text-decoration:none;"

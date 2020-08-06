@@ -234,15 +234,8 @@
           </transition>
           <v-divider></v-divider>
           <v-flex md6 lg4 pb-4>
-            <v-btn
-              block
-              text
-              dark
-              small
-              color="primary"
-              @click="switchComponent()"
-            >
-              {{ dialog.switchText }}
+            <v-btn block text dark small color="primary" @click="openBrowser()">
+              Create Account
             </v-btn>
           </v-flex>
         </div>
@@ -262,7 +255,6 @@ import Navbar from './components/Navbar.vue';
 import BottomNavbar from './components/BottomNavbar.vue';
 import Snackbar from './components/Snackbar.vue';
 import Login from './components/dialog/Login.vue';
-import Create from './components/dialog/Create.vue';
 import { mapGetters } from 'vuex';
 import { sampleData } from './mixins/sampleData.js';
 import { fetchData } from './mixins/fetchData.js';
@@ -275,27 +267,27 @@ export default {
     items: [
       {
         icon: 'fa-home',
-        title: 'home',
+        title: 'Home',
         to: '/',
       },
       {
         icon: 'fa-list',
-        title: 'list',
+        title: 'Crag List',
         to: '/list',
       },
       {
         icon: 'fa-map',
-        title: 'map',
+        title: 'Map',
         to: '/map',
       },
+      // {
+      //   icon: 'fa-folder',
+      //   title: 'file test',
+      //   to: '/file-test',
+      // },
       {
         icon: 'fa-folder',
-        title: 'file test',
-        to: '/file-test',
-      },
-      {
-        icon: 'fa-folder',
-        title: 'downloads',
+        title: 'Downloads',
         to: '/downloads',
       },
     ],
@@ -375,6 +367,19 @@ export default {
         this.getUser();
       }
     },
+    onDeviceReady() {
+      cordova.plugin.http.setDataSerializer('json');
+      console.log('in device ready');
+      document.addEventListener('online', this.onOnline, false);
+      this.getUser();
+    },
+    openBrowser() {
+      cordova.InAppBrowser.open(
+        'https://climbassist.com/user/signup-mobile',
+        '_self',
+        'location=no,zoom=no'
+      );
+    },
     setAgreement() {
       this.$store.commit(
         'updateMessage',
@@ -424,15 +429,6 @@ export default {
 
       return str;
     },
-    switchComponent() {
-      if (this.dialog.component === 'login') {
-        this.$store.commit('updateDialogComponent', 'create');
-        this.$store.commit('updateDialogSwitchText', 'Login');
-      } else {
-        this.$store.commit('updateDialogComponent', 'login');
-        this.$store.commit('updateDialogSwitchText', 'Create Account');
-      }
-    },
   },
   components: {
     defaultV: DefaultView,
@@ -446,17 +442,12 @@ export default {
     bottomNav: BottomNavbar,
     snackbar: Snackbar,
     login: Login,
-    create: Create,
   },
   created() {
-    this.getUser();
+    document.addEventListener('deviceready', this.onDeviceReady, false);
   },
-  mounted() {
-    document.addEventListener('online', this.onOnline, false);
-    // this.setAgreement();
-  },
+  mounted() {},
 };
-// document.addEventListener('deviceready', app.init);
 </script>
 
 <style>

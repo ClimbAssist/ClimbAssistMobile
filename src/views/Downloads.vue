@@ -1,5 +1,5 @@
 <template>
-  <v-container justify-start v-if="user">
+  <v-container justify-start v-if="user && readComplete && deleteComplete">
     <div v-for="(crag, i) in crags" :key="i" class="d-flex flex-row pa-4">
       <span class="align-self-start">
         <router-link
@@ -49,12 +49,6 @@
         </v-dialog>
       </span>
     </div>
-    <p>json: {{ jsonDeleted }}</p>
-    <p>model: {{ modelDeleted }}</p>
-    <p>directory: {{ directoryDeleted }}</p>
-    <p>deleting: {{ deleting }}</p>
-    <p>deleteComplete: {{ deleteComplete }}</p>
-    crags: {{ crags }}
   </v-container>
 </template>
 
@@ -103,7 +97,7 @@ export default {
         return false;
       } else {
         console.log('no match in deleteComplete');
-        return false;
+        return true;
       }
     },
     readComplete() {
@@ -169,12 +163,14 @@ export default {
                           };
                         },
                         (error) => {
+                          this.loadedJsons.push(true);
                           console.log('error reading json file');
                           console.log(error);
                         }
                       );
                     },
                     (error) => {
+                      this.loadedJsons.push(true);
                       console.log('error getting json file');
                       console.log(error);
                     }

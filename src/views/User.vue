@@ -56,12 +56,12 @@ export default {
           this.$router.push('/');
           this.$store.commit('updateDialogComponent', 'login');
 
-          this.$store.commit('snackbar/updateType', 'success');
-          this.$store.commit('snackbar/updateTimeout', 10000);
-          this.$store.commit('snackbar/updateMessage', 'Logged Out');
-          this.$store.commit('snackbar/updateSnackbar', true);
-          this.$store.commit('snackbar/link', undefined);
-          this.$store.commit('snackbar/linkMessage', undefined);
+          this.$store.commit('updateType', 'success');
+          this.$store.commit('updateTimeout', 10000);
+          this.$store.commit('updateMessage', 'Logged Out');
+          this.$store.commit('updateSnackbar', true);
+          this.$store.commit('link', undefined);
+          this.$store.commit('linkMessage', undefined);
         },
         (response) => {
           //fail user not loggged in
