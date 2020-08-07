@@ -7,7 +7,7 @@
     <author email="dev@climbassist.com" href="http://climbassist.com">
         Climb Assist Team
     </author>
-    <icon src="www/img/logo.deb63e2c.png" />
+    <icon src="./icon.png" />
     <!-- this hook will point your config.xml to the DevServer on Serve -->
     <hook type="after_prepare" src="../node_modules/vue-cli-plugin-cordova/serve-config-hook.js" />
     <content src="index.html" />
