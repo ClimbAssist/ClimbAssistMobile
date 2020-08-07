@@ -256,7 +256,6 @@ import BottomNavbar from './components/BottomNavbar.vue';
 import Snackbar from './components/Snackbar.vue';
 import Login from './components/dialog/Login.vue';
 import { mapGetters } from 'vuex';
-import { sampleData } from './mixins/sampleData.js';
 import { fetchData } from './mixins/fetchData.js';
 import { fetchUser } from './mixins/fetchUser.js';
 export default {
@@ -303,7 +302,7 @@ export default {
       trad: true,
     },
   }),
-  mixins: [sampleData, fetchData, fetchUser],
+  mixins: [fetchData, fetchUser],
   computed: {
     isAdministrator() {
       return this.$store.state.user.isAdministrator;
