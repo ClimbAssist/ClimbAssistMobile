@@ -81,7 +81,10 @@ export const fetchUser = {
                 // Using Date objects
                 let now = Date.now();
                 let elapsed = now - file.lastModified;
-                console.log(file.lastModified);
+                console.log('current time:' + now);
+                console.log('last modfied:' + file.lastModified);
+                let days = elapsed / (1000 * 60 * 60 * 24);
+                console.log("it's been" + days + 'days');
                 let month = 30 * 1000 * 60 * 60 * 24;
                 if (elapsed > month) {
                   //it's been so long! time to login
@@ -91,8 +94,6 @@ export const fetchUser = {
                     "it's been so long! Connect to internet and login to continue"
                   );
                 } else {
-                  let days = elapsed / (1000 * 60 * 60 * 24);
-                  console.log("it's been" + days + 'days');
                   let reader = new FileReader();
                   reader.readAsText(file);
                   reader.onloadend = (result) => {

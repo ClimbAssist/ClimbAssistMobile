@@ -1,13 +1,6 @@
 <template>
   <v-app id="app">
-    <v-navigation-drawer
-      v-if="username"
-      v-model="drawer"
-      fixed
-      app
-      clipped
-      touchless
-    >
+    <v-navigation-drawer v-model="drawer" fixed app clipped touchless>
       <v-list>
         <v-list-item v-if="username" to="/user" router>
           <v-list-item-action>
@@ -40,7 +33,7 @@
         <component :is="sidebar" />
       </div>
     </v-navigation-drawer>
-    <v-app-bar color="primary" dark fixed app clipped-left>
+    <v-app-bar v-if="username" color="primary" dark fixed app clipped-left>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <img style="max-width:50px" src="@/assets/ClimbAssist_Logo_img.png" />
       <v-flex hidden-sm-and-down shrink>
@@ -49,7 +42,7 @@
       <v-spacer />
       <navbar />
       <v-spacer />
-      <v-bottom-sheet v-if="!editor" inset v-model="showSheet">
+      <v-bottom-sheet inset v-model="showSheet">
         <template v-slot:activator="{ on }">
           <v-btn v-on="on" light small fab aria-label="Route Filter">
             <v-badge :value="resetButton" color="red" right bottom>
@@ -219,7 +212,7 @@
         </v-container>
       </v-bottom-sheet>
     </v-app-bar>
-    <v-main d-inline>
+    <v-main d-inline v-if="username">
       <snackbar />
       <router-view />
     </v-main>
