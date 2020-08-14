@@ -163,14 +163,14 @@ export default {
                           };
                         },
                         (error) => {
-                          this.loadedJsons.push(true);
+                          this.loadedJsons.push(false);
                           console.log('error reading json file');
                           console.log(error);
                         }
                       );
                     },
                     (error) => {
-                      this.loadedJsons.push(true);
+                      this.loadedJsons.push(false);
                       console.log('error getting json file');
                       console.log(error);
                     }

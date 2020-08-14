@@ -102,7 +102,7 @@
               <v-layout v-for="(crag, ci) in subArea.filteredCrags" :key="ci">
                 <router-link
                   :to="{
-                    name: 'crags',
+                    name: 'frame',
                     params: {
                       subAreaKey: subArea.subAreaKey,
                       cragKey: crag.cragKey,

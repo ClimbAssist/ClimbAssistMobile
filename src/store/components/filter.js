@@ -200,6 +200,8 @@ const getters = {
                     .toUpperCase()
                     .includes(state.filter.filterText.toUpperCase())) &&
                 (cragTotals.trad || cragTotals.sport || cragTotals.boulder) &&
+                state.countries[tkey].regions[skey].areas[akey].subAreas[subkey]
+                  .crags[ckey].state === 'PUBLIC' &&
                 (!state.mapBounds ||
                   (((state.mapBounds._ne.lat >
                     state.countries[tkey].regions[skey].areas[akey].subAreas[
@@ -267,7 +269,9 @@ const getters = {
           filteredRoutes.regions.push(regionTotals);
         }
       }
-      filteredRoutes.countries.push(countryTotals);
+      if (countryTotals.trad || countryTotals.sport || countryTotals.boulder) {
+        filteredRoutes.countries.push(countryTotals);
+      }
     }
     return filteredRoutes;
   },

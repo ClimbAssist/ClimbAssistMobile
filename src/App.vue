@@ -1,6 +1,13 @@
 <template>
   <v-app id="app">
-    <v-navigation-drawer v-model="drawer" fixed app clipped touchless>
+    <v-navigation-drawer
+      v-if="username"
+      v-model="drawer"
+      fixed
+      app
+      clipped
+      touchless
+    >
       <v-list>
         <v-list-item v-if="username" to="/user" router>
           <v-list-item-action>

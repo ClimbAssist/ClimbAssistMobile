@@ -259,7 +259,7 @@ export default {
 
           const feature = features[0];
           this.$router.push({
-            name: 'area-frame',
+            name: 'frame',
             params: {
               subAreaKey: feature.properties.subAreaKey,
               cragKey: feature.properties.cragKey,
